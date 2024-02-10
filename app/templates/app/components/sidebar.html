@@ -1,0 +1,27 @@
+{% load static %}
+
+<aside class="col-2 h-100 rounded-4 text-center p-4 position-relative d-flex flex-column align-items-center text-white" style="background: #388E3C">
+    <div class="row">
+        <div class="d-flex justify-content-center align-items-center gap-2">
+            <div>
+                <img src="{% static 'images/logo.svg' %}" alt="logo" style="width: 3em"/>
+            </div>
+            <span class="fs-2">Linkaroo</span>
+        </div>
+    </div>
+    <ul class="row list-unstyled fs-5 my-4 gap-2">
+        <li>
+            <a class="text-decoration-none text-white" href="{% url 'url_tracker:overview' %}">Overview</a>
+        </li>
+        <li>
+            <a class="text-decoration-none text-white" href="{% url 'url_tracker:list' %}">Manage URL</a>
+        </li>
+        <li>
+            <a class="text-decoration-none text-white" href="#">Logout</a>
+        </li>
+    </ul>
+    <div class="text-white p-4 rounded-4 w-75 row position-absolute bottom-0 mb-4" style="background: #8BC34A">
+        <p class="">Have any problems with manage your dashboard? Try to contact the Customer Support</p>
+        <button class="btn" style="background: #F2F9F1">Contact Us</button>
+    </div>
+</aside>

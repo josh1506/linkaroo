@@ -1,0 +1,14 @@
+<form class="d-flex flex-column gap-3 p-4 rounded-4 shadow" action="{% url 'url_tracker:update' pk=object.pk %}" method="POST" style="background: #FFFFFF">
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <p>{{ form.errors }}</p>
+        </div>
+    {% endif %}
+
+    {{ form }}
+    {% csrf_token %}
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'url_tracker:details' pk=object.pk %}" class="btn btn-danger">Cancel</a>
+        <button type="submit" class="btn btn-success">Save</button>
+    </div>
+</form>

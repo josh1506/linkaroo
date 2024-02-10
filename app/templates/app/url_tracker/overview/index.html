@@ -1,0 +1,54 @@
+{% extends 'app/url_tracker/base.html' %}
+{% load static %}
+{% block 'title' %}Overview{% endblock %}
+
+{% block 'content' %}
+    <div class="row">
+        <div class="col-8 d-flex align-items-end justify-content-between">
+            <div>
+                <span>Welcome Back,</span>
+                <h2>Firstname Lastname</h2>
+            </div>
+            <div class="mb-2">
+                <a class="btn shadow" href="{% url 'url_tracker:create' %}" style="background: #F2F9F1">Create Link</a>
+            </div>
+        </div>
+        <div class="col-4 "></div>
+    </div>
+    <div class="row">
+        <div class="col-8">
+            {% include 'app/url_tracker/overview/extra_feature_ads.html' %}
+
+            <div class="row">
+                {% include 'app/url_tracker/overview/total_link_chart.html' %}
+                {% include 'app/url_tracker/overview/total_clicks_chart.html' %}
+            </div>
+            <div class="row">
+                {% include 'app/url_tracker/overview/latest_total_clicks.html' %}
+            </div>
+        </div>
+        <div class="col-4">
+            {% include 'app/url_tracker/overview/top_links.html' %}
+            {% include 'app/url_tracker/overview/total_active_url_chart.html' %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block 'extra_scripts' %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        google.charts.load('current', {'packages':['corechart']});
+
+        // Variables
+        const latestTotalClicks = JSON.parse("{{ latest_total_clicks|escapejs }}")
+        const totalClicks = JSON.parse("{{ total_clicks_data|escapejs }}")
+        const totalLinksData = JSON.parse("{{ total_links_data|escapejs }}")
+        const totalActiveUrl = JSON.parse("{{ total_active_url|escapejs }}")
+    </script>
+
+    <script type="text/javascript" src="{% static 'js/app/dashboard/total_links.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/app/dashboard/total_clicks.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/app/dashboard/latest_clicks.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/app/dashboard/total_active_url.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,29 @@
+<div class="d-flex gap-3 p-4 rounded-4 shadow" style="background: #FFFFFF">
+    <div class="col-10 d-flex flex-column gap-3">
+        <div>
+            <span class="fs-5">ID:</span>
+            <p>{{ object.id }}</p>
+        </div>
+        <div>
+            <span class="fs-5">Link:</span>
+            <p>{{ object.link }}</p>
+        </div>
+        <div>
+            <span class="fs-5">Title:</span>
+            <p>{{ object.title }}</p>
+        </div>
+        <div>
+            <span class="fs-5">Custom URL:</span>
+            <p>{{ object.custom_url }}</p>
+        </div>
+        <div>
+            <span class="fs-5">Description:</span>
+            <p>{{ object.description }}</p>
+        </div>
+    </div>
+    <div class="col-2 d-flex flex-column gap-2 px-4">
+        <a class="btn btn-warning" href="{% url 'url_tracker:update' pk=object.pk %}">Edit</a>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+        <a class="btn btn-outline-secondary" href="{% url 'url_tracker:list' %}">Go Back</a>
+    </div>
+</div>

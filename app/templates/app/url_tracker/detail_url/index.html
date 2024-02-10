@@ -1,0 +1,22 @@
+{% extends 'app/url_tracker/base.html' %}
+{% block 'title' %}Details{% endblock %}
+
+{% block 'content' %}
+    <div class="rounded-3 h-100 w-100 d-flex flex-column gap-2">
+        <div class="row">
+            <h1>Link Lists</h1>
+        </div>
+        <div class="row h-100 w-100">
+            <div class="col-9 h-100" >
+                {% include 'app/url_tracker/detail_url/details.html' %}
+            </div>
+            <div class="col-3 h-100 pl-4 d-flex flex-column gap-3">
+                {% include 'app/url_tracker/detail_url/info.html' %}
+
+                {% include 'app/components/sidebar_ads.html' %}
+            </div>
+        </div>
+    </div>
+
+    {% include 'app/url_tracker/detail_url/url_confirm_delete.html' %}
+{% endblock %}
