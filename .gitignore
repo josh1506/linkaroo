@@ -318,6 +318,7 @@ Session.vim
 # Temporary
 .netrwhist
 *.sqlite3
+.todo
 
 # Auto-generated tag files
 tags
