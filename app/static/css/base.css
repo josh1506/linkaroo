@@ -1,0 +1,18 @@
+.btn-default, .bg-default {
+    background: #FFFFFF !important;
+}
+
+.btn-default:hover {
+    background: #F2F9F1 !important;
+    color: black !important;
+}
+
+.btn-primary, .bg-primary {
+    background: #388E3C !important;
+}
+
+.btn-secondary, .bg-secondary {
+    background: #8BC34A !important;
+}
+
+
