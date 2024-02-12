@@ -1,5 +1,6 @@
 .btn-default, .bg-default {
     background: #FFFFFF !important;
+    border-width: 0 !important;
 }
 
 .btn-default:hover {
@@ -9,10 +10,12 @@
 
 .btn-primary, .bg-primary {
     background: #388E3C !important;
+    border-width: 0 !important;
 }
 
 .btn-secondary, .bg-secondary {
     background: #8BC34A !important;
+    border-width: 0 !important;
 }
 
 

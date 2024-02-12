@@ -23,7 +23,10 @@
                     </div>
                 {% endfor %}
 
-                <button type="submit" class="mt-2 btn btn-secondary text-white">Login</button>
+                <div class="d-flex flex-column gap-2 mt-2">
+                    <button type="submit" class="btn btn-secondary text-white">Login</button>
+                    <a href="{% url 'users:signup' %}" class="btn btn-default text-black border" style="border-width: 1px">Signup</a>
+                </div>
             </div>
         </form>
     </div>
