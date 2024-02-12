@@ -1,0 +1,29 @@
+{% extends 'app/users/base.html' %}
+
+{% block 'content' %}
+    <div class="d-flex h-100 justify-content-center align-items-center">
+        <form class="bg-default rounded-5 p-5 shadow w-25" method="post">
+            <h2 class="text-center">Register New Account</h2>
+            {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for key, error in form.errors.items %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="d-flex flex-column">
+                    {{ field.label_tag }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+            {% csrf_token %}
+
+            <div class="d-flex justify-content-between mt-3">
+                <a class="mt-2 btn btn-danger text-white" href="{% url 'users:login' %}">Cancel</a>
+                <button type="submit" class="mt-2 btn btn-secondary text-white">Register</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
