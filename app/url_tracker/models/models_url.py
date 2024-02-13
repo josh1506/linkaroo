@@ -33,7 +33,7 @@ class URL(ActivatorModel, Model):
 
     link = models.URLField(verbose_name="Link")
     title = models.CharField(max_length=255, verbose_name="Title")
-    custom_url = models.CharField(max_length=255, verbose_name="Shortened", blank=True, null=True)
+    custom_url = models.CharField(max_length=255, verbose_name="Shortened", blank=True, null=True, unique=True)
     owner = models.ForeignKey(
         User, verbose_name="Owner", on_delete=models.CASCADE, related_name="url", blank=True, null=True
     )

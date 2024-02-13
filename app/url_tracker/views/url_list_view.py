@@ -9,5 +9,5 @@ class UrlListView(generic.ListView):
     context_object_name = 'url_list'
     paginate_by = 10
 
-    # def get_queryset(self):
-    #     return self.model.objects.filter(owner=self.request.user.pk)
+    def get_queryset(self):
+        return self.model.objects.filter(owner=self.request.user.pk)
