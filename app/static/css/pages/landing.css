@@ -1,0 +1,26 @@
+#landing-hero > img {
+    user-select: none;
+}
+
+#landing-hero > div {
+    top: 35%;
+    left: 10%;
+    width: 40%;
+}
+
+#landing-hero > div > h1 {
+    font-size: 60px;
+    letter-spacing: 1px;
+}
+
+#landing-hero > div > p {
+    font-size: 20px;
+}
+
+#landing-hero > div > a {
+    font-size: 26px;
+}
+
+.feature-card {
+    width: 20em;
+}

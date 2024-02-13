@@ -1,0 +1,35 @@
+<section class="bg-secondary p-5" id="subscription">
+    <h2 class="text-center text-white">Subscriptions</h2>
+    <div class="container d-flex flex-column gap-2">
+        <div class="border p-2 rounded-4 row" style="background: #DDEEDF">
+            <div class="col-9 py-4 px-5">
+                <div>
+                    <h5>Free Tier: Basic</h5>
+                    <p>Ideal for individuals and small businesses, our Basic plan offers essential URL tracking features without any cost. Start creating custom URLs and tracking clicks today, completely free of charge.</p>
+                </div>
+                <div>
+                    <span><b>What's included</b></span>
+                    <ul class="row" style="list-style: '✓';">
+                        <li class="col-6">Custom URL Creation</li>
+                        <li class="col-6">Click Tracking</li>
+                        <li class="col-6">Limited Analytics</li>
+                        <li class="col-6">Up to 10 Custom URLs</li>
+                        <li class="col-6">Email Support</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-3 text-center d-flex flex-column justify-content-center gap-2 shadow rounded-4">
+                <div>
+                    <span class="fs-1">$0</span>
+                    <span>USD / month</span>
+                </div>
+                <div class="d-grid">
+                    <a class="btn btn-primary" href="{% url 'users:login' %}">Get access</a>
+                </div>
+                <div>
+                    <p><small>Invoices and receipts available for easy company reimbursement</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,15 @@
+{% extends 'pages/base.html' %}
+{% load static %}
+
+{% block 'content' %}
+    {% include 'pages/landing/hero.html' %}
+    {% include 'pages/landing/feature.html' %}
+    {% include 'pages/landing/about.html' %}
+    {% include 'pages/landing/subscription.html' %}
+    {% include 'pages/landing/contact.html' %}
+    {% include 'pages/landing/cta.html' %}
+{% endblock %}
+
+{% block 'extra_css' %}
+    <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}" />
+{% endblock %}
