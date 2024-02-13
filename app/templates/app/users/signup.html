@@ -1,8 +1,8 @@
 {% extends 'app/users/base.html' %}
 
 {% block 'content' %}
-    <div class="d-flex h-100 justify-content-center align-items-center">
-        <form class="bg-default rounded-5 p-5 shadow w-25" method="post">
+    <div class="d-flex h-100 justify-content-center align-items-center my-5">
+        <form class="bg-default rounded-5 p-5 shadow w-25 d-flex flex-column gap-2" method="post">
             <h2 class="text-center">Register New Account</h2>
             {% if form.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -20,7 +20,7 @@
             {% endfor %}
             {% csrf_token %}
 
-            <div class="d-flex justify-content-between mt-3">
+            <div class="d-flex justify-content-between">
                 <a class="mt-2 btn btn-danger text-white" href="{% url 'users:login' %}">Cancel</a>
                 <button type="submit" class="mt-2 btn btn-secondary text-white">Register</button>
             </div>
