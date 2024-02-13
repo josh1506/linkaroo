@@ -2,13 +2,19 @@ import json
 
 from django.views import generic
 
-from app.url_tracker.models import URL
+from app.url_tracker.utils import get_latest_7_days_total_clicks, get_total_active_urls, get_top_5_links
 
 
 class UrlOverviewTemplateView(generic.TemplateView):
     template_name = 'app/url_tracker/overview/index.html'
 
     def get_context_data(self, **kwargs):
+        user_url = self.request.user.url.all()
+
+        kwargs['top_links'] = get_top_5_links(user_url)
+        kwargs['total_active_url'] = json.dumps(get_total_active_urls(user_url))
+        kwargs['latest_total_clicks'] = json.dumps(get_latest_7_days_total_clicks(user_url))
+
         kwargs['total_links_data'] = json.dumps({
             'active_links_count': 0,
             'recent_7_days_created': [
@@ -53,23 +59,4 @@ class UrlOverviewTemplateView(generic.TemplateView):
             ]
         })
 
-        kwargs['latest_total_clicks'] = json.dumps([
-            ['2004', 1000, 400],
-            ['2005', 1170, 460],
-            ['2006', 660, 1120],
-            ['2007', 1030, 540]
-        ])
-
-        kwargs['total_active_url'] = json.dumps([
-            ['active', 24],
-            ['in-active', 40]
-        ])
-
-        kwargs['top_links'] = [
-            {
-                'id': str(url.id),
-                'link': url.link,
-                'title': url.title,
-            } for url in URL.objects.all()[:5]
-        ]
         return kwargs

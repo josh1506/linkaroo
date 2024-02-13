@@ -10,5 +10,5 @@ class URLCreateView(generic.CreateView):
     success_url = reverse_lazy('url_tracker:list')
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user.id
+        form.instance.owner = self.request.user
         return super().form_valid(form)
