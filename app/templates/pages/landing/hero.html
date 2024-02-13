@@ -1,0 +1,10 @@
+{% load static %}
+
+<section class="position-relative" id="landing-hero">
+    <img src="{% static 'images/pages/landing/hero-background.svg' %}" alt="background" width="100%" draggable="false">
+    <div class="position-absolute ml-5">
+        <h1>Welcome to Linkaroo - Your Ultimate URL Tracking Solution</h1>
+        <p>Maximize your online presence with Linkaroo, the leading web application for URL tracking and management. Create, customize, and track your URLs effortlessly, gaining invaluable insights into user behavior and engagement.</p>
+        <a class="bg-primary rounded-5 text-decoration-none text-white px-4 py-3" href="{% url 'users:login' %}">Start Exploring</a>
+    </div>
+</section>

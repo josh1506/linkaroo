@@ -19,9 +19,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views import defaults as default_views
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
 urlpatterns = [
+    path('', TemplateView.as_view(template_name='pages/landing/index.html'), name='landing'),
     path('admin/', admin.site.urls),
+]
+
+# Apps
+urlpatterns += [
     path('auth/', include('app.users.urls')),
     path('urls/', include('app.url_tracker.urls')),
 ]
