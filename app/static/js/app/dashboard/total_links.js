@@ -1,9 +1,23 @@
 function drawTotalLinksChart() {
-    var data = google.visualization.arrayToDataTable(latestTotalClicks);
-    var options = {curveType: 'function', legend: { position: 'bottom' }};
-    var chart = new google.visualization.LineChart(document.getElementById('total_links_chart'));
+    var data = google.visualization.arrayToDataTable([
+        ["Year", "Count", { role: "style" } ],
+        ...totalLinksData
+    ]);
 
-    chart.draw(data, options);
+    var view = new google.visualization.DataView(data);
+    view.setColumns([0, 1,
+        {
+            calc: "stringify",
+            sourceColumn: 1,
+            type: "string",
+            role: "annotation"
+        }, 2
+    ]);
+
+    var options = {bar: {groupWidth: "90%"}, legend: { position: "none" }};
+    var chart = new google.visualization.ColumnChart(document.getElementById("total_links_chart"));
+
+    chart.draw(view, options);
 }
 
 google.charts.setOnLoadCallback(drawTotalLinksChart);

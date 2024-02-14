@@ -1,13 +1,9 @@
-google.charts.setOnLoadCallback(drawChart3);
+function drawLatestClicksChart() {
+    var data = google.visualization.arrayToDataTable(latestTotalClicks);
+    var options = {curveType: 'function', legend: { position: 'bottom' }};
+    var chart = new google.visualization.LineChart(document.getElementById('latest_total_clicks_chart'));
 
-function drawChart3() {
-    var data = google.visualization.arrayToDataTable([['Dinosaur', 'Length'], ...totalLinksData.recent_7_days_created]);
-
-    var options = {
-    // title: 'Lengths of dinosaurs, in meters',
-    legend: { position: 'none' },
-    };
-
-    var chart = new google.visualization.Histogram(document.getElementById('chart_div1'));
     chart.draw(data, options);
 }
+
+google.charts.setOnLoadCallback(drawLatestClicksChart);

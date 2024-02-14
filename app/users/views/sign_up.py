@@ -13,7 +13,7 @@ User = get_user_model()
 class SignUpTemplateView(CreateView):
     template_name = 'app/users/signup.html'
     form_class = RegistrationForm
-    success_url = reverse_lazy('url_tracker:overview')
+    success_url = reverse_lazy('users:login')
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
