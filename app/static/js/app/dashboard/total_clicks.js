@@ -1,14 +1,10 @@
 google.charts.setOnLoadCallback(drawTotalClicksChart);
 
 function drawTotalClicksChart() {
-    var data = google.visualization.arrayToDataTable([
-        ['Year', 'Sales', 'Expenses', 'Sample'],
-        ...totalClicks.recent_7_days_created
-    ]);
+    var data = google.visualization.arrayToDataTable(totalClicks);
 
     var options = {
-        // title: 'Company Performance',
-        hAxis: {title: 'Year',  titleTextStyle: {color: '#333'}},
+        hAxis: {title: 'Date',  titleTextStyle: {color: '#333'}},
         vAxis: {minValue: 0}
     };
 
