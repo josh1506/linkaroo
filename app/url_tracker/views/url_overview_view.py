@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import generic
 
 from app.url_tracker.utils import (
@@ -10,7 +11,7 @@ from app.url_tracker.utils import (
 )
 
 
-class UrlOverviewTemplateView(generic.TemplateView):
+class UrlOverviewTemplateView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'app/url_tracker/overview/index.html'
 
     def get_context_data(self, **kwargs):
