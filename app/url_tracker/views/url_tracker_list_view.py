@@ -1,9 +1,10 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 
 from app.url_tracker.models import models_url_tracker
 
 
-class UrlTrackerListView(ListView):
+class UrlTrackerListView(LoginRequiredMixin, ListView):
     model = models_url_tracker.URLTracker
     template_name = 'app/url_tracker/tracker_list/index.html'
     context_object_name = 'tracker_list'
