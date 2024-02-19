@@ -8,13 +8,13 @@ def get_date_list(days_count):
     return [today - timedelta(days=i) for i in range(days_count, -1, -1)]
 
 
-def get_latest_7_days_total_clicks(user_url):
-    last_7_days = get_date_list(7)
+def get_url_clicks_day_range(user_url, days_count):
+    day_list = get_date_list(days_count)
 
     url_titles = [url.title for url in user_url]
     data = [["Day", *url_titles]]
 
-    for day in last_7_days:
+    for day in day_list:
         day_data = [day.strftime('%b %d')]
         for url in user_url:
             total_clicks = url.tracker.filter(created_at__date=day).count()
