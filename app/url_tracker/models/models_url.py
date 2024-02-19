@@ -11,6 +11,7 @@ from app.utils.model import Model
 
 User = get_user_model()
 
+
 def generate_unique_link():
     # Define characters to be used in short link
     characters = string.ascii_letters + string.digits

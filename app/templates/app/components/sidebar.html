@@ -17,6 +17,9 @@
             <a class="text-decoration-none text-white" href="{% url 'url_tracker:list' %}">Manage URL</a>
         </li>
         <li>
+            <a class="text-decoration-none text-white" href="{% url 'url_tracker:tracker-list' %}">URL Tracker</a>
+        </li>
+        <li>
             <form action="{% url 'users:logout' %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn text-white fs-5" href="#">Logout</button>

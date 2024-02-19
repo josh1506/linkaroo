@@ -1,0 +1,50 @@
+<div class="d-flex flex-column gap-3 p-4 rounded-4 shadow bg-default">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>URL</th>
+                <th>Created Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tracker in tracker_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ tracker.url.title }}</td>
+                    <td>
+                        <a href="{{ tracker.url.link }}" target="_blank">{{ tracker.url.link }}</a>
+                    </td>
+                    <td>{{ tracker.created_at }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-end">
+        <nav aria-label="...">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+
+                {% for page_num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_num == page_obj.number %}active{% endif %}" aria-current="page">
+                        <a class="page-link" href="?page={{ page_num }}">
+                            {{ page_num }}
+                        </a>
+                    </li>
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
