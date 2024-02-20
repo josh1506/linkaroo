@@ -16,8 +16,12 @@ PRODUCTION = os.environ.get('PRODUCTION')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get('NAME'),
+        'USER': os.environ.get('USER'),
+        'PASSWORD': os.environ.get('PASSWORD'),
+        'HOST': os.environ.get('HOST'),
+        'PORT': os.environ.get('PORT'),
     }
 }
 
@@ -26,12 +30,12 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'media')
+    os.path.join(BASE_DIR, 'app/static'),
+    os.path.join(BASE_DIR, 'app/media')
 ]
 
-STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
+STATIC_URL = 'app/static/'
+MEDIA_URL = 'app/media/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'app/staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'app/mediafiles')
