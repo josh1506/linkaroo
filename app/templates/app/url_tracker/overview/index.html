@@ -7,7 +7,7 @@
         <div class="col-8 d-flex align-items-end justify-content-between">
             <div>
                 <span>Welcome Back,</span>
-                <h2>Firstname Lastname</h2>
+                <h2>{{ user.first_name }} {{ user.last_name }}</h2>
             </div>
             <div class="mb-2">
                 <a class="btn btn-default shadow" href="{% url 'url_tracker:create' %}">Create Link</a>
