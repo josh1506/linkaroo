@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SECRET_KEY: ci-only-not-secret
+      DEBUG: "False"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install
+        run: pip install -r requirements/local.txt -r requirements/production.txt pip-audit
+      - name: Django system check
+        run: python manage.py check --fail-level ERROR
+      - name: Migrations are committed
+        run: python manage.py makemigrations --check --dry-run
+      - name: Tests (deprecations are errors)
+        run: python -W error::DeprecationWarning manage.py test
+      - name: Deploy checklist (production settings)
+        env:
+          DB_PASSWORD: ci-dummy
+          DJANGO_ALLOWED_HOSTS: example.com
+          SECRET_KEY: ci-only-long-random-looking-value-0123456789abcdefghijklmnopqrstuvwxyz
+        # Fail on any security warning except W004 (HSTS), which stays off until HTTPS is confirmed in production.
+        run: |
+          python manage.py check --deploy --settings=config.settings.production 2>&1 | tee deploy.txt
+          if grep -E "security\.[WE][0-9]+" deploy.txt | grep -v "security.W004"; then exit 1; fi
+      - name: Dependency audit
+        run: pip-audit -r requirements/production.txt
