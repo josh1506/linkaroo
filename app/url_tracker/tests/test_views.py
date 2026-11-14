@@ -64,6 +64,20 @@ class OwnerFlowTests(Base):
         self.assertEqual(u.owner, self.alice)
         self.assertEqual(len(u.custom_url), 12)
 
+    def test_create_accepts_long_campaign_link(self):
+        # Migration 0004: links up to 2048 chars (real UTM-tagged URLs exceed the old 200 limit).
+        long_link = "https://example.com/landing?" + "&".join(f"utm_param{i}=value{i}" for i in range(12))
+        self.assertGreater(len(long_link), 200)
+        r = self.client.post(reverse("url_tracker:create"), {"link": long_link, "title": "Campaign", "custom_url": "", "description": ""})
+        self.assertRedirects(r, reverse("url_tracker:list"))
+        self.assertEqual(URL.objects.get(title="Campaign").link, long_link)
+
+    def test_create_rejects_link_over_2048(self):
+        r = self.client.post(reverse("url_tracker:create"), {"link": "https://example.com/" + "a" * 2100, "title": "Huge",
+                                                             "custom_url": "", "description": ""})
+        self.assertEqual(r.status_code, 200)
+        self.assertFalse(URL.objects.filter(title="Huge").exists())
+
     def test_create_rejects_unsafe_scheme(self):
         r = self.client.post(reverse("url_tracker:create"),
                              {"link": "javascript:alert(1)", "title": "X", "custom_url": "", "description": ""})

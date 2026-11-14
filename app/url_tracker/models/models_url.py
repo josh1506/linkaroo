@@ -32,7 +32,7 @@ class URL(ActivatorModel, Model):
         verbose_name_plural = "URLs"
         ordering = ["-created_at"]
 
-    link = models.URLField(verbose_name="Link")
+    link = models.URLField(verbose_name="Link", max_length=2048)
     title = models.CharField(max_length=255, verbose_name="Title")
     custom_url = models.CharField(max_length=255, verbose_name="Shortened", blank=True, null=True, unique=True)
     owner = models.ForeignKey(
