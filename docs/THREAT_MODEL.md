@@ -2,7 +2,7 @@
 
 - **Date:** 2026-11-14 · **Code:** branch `upgrade/upg-001` (after UPG-001 stages 0–6) · **Standard:** OWASP ASVS **5.0.0** (IDs verified against `OWASP/ASVS@v5.0.0`).
 - **Method:** source review + local probes on a throwaway in-memory test DB via Django's test client. No production, no network scanning, no real data. Secret values are never reproduced here.
-- **Status:** findings F1–F9 are **open** and covered by `@expectedFailure` regression tests in `app/url_tracker/tests/test_security.py`.
+- **Status:** F1–F10 **remediated locally** (see *Remediation status*). F11 and F12 are owner/operational items. Regression tests: `app/url_tracker/tests/test_security.py` (each finding first reproduced as an `@expectedFailure` test).
 
 ## Context
 
@@ -64,6 +64,22 @@ App      ──► [B5 data]     SQLite (local/staging) / PostgreSQL (production
 | **F11** | Previously committed `SECRET_KEY` / DB password reused in a live deployment | B5 | Unknown | **Critical if live** (session forgery / DB access) | Present in 2 commits of public history | **Owner action:** rotate both; consider purging history | 13.x | n/a (operational) |
 | **F12** | Malicious destinations (phishing/malware) behind a trusted short domain | B1 | High for any public shortener | High (reputation, blocklisting) | Any http(s) destination accepted | **Documented exception to ASVS 3.7.2/3.7.3** (redirecting off-site is the product). Compensating: scheme allowlist (done), sign-up limits (F4), abuse reporting + disable-link procedure, optional reputation check (external service — needs approval) | 3.7.2, 3.7.3 | — |
 
+## Remediation status (2026-11-14, branch `upgrade/upg-001`, not deployed)
+| ID | Fix | Commit | Re-probe after fix | Config it depends on |
+|---|---|---|---|---|
+| F1 | Lockout moved into a form mixin; `admin.site.login_form` uses it | `57cd461` | 10 failures → right password rejected | — |
+| F2 | Per-client cap of 30 failures / 15 min, plus 5 per account | `57cd461` | 60 sprayed attempts → 30 × 429 | — |
+| F3 | Client IP from `X-Forwarded-For` only for `TRUSTED_PROXY_COUNT` proxies | `57cd461` | Victim behind a proxy logs in (302) | **Set `TRUSTED_PROXY_COUNT`** to the real proxy count when deployed behind one. With the default 0 and a proxy, the gap remains. |
+| F4 | `SIGNUPS_PER_CLIENT_PER_HOUR` (default 5), 429 | `a44e107` | 20 attempts → 5 accounts | — |
+| F5 | Always redirect; record at most `CLICK_RECORD_LIMIT_PER_MINUTE` (default 30) clicks per client per link | `a44e107` | 500 GETs → 30 rows | Clients behind a shared NAT are under-counted beyond 30/min/link. 0 disables the cap. |
+| F6 | New/changed destinations whose host matches `ALLOWED_HOSTS` are rejected | `3b5aff1` | Loop links rejected | **Needs real hostnames in `ALLOWED_HOSTS`** (true for staging/production). With `*` (local) there's no check. |
+| F7 | Click log filters `url__owner` | `a44e107` | Previous owner sees nothing | — |
+| F8 | New/changed destinations: `http`/`https` only; unchanged legacy links stay editable and keep redirecting | `3b5aff1` | ftps rejected | — |
+| F9 | `secrets.choice` for generated aliases (same format) | `3b5aff1` | — | — |
+| F10 | CSP middleware: strict app policy, separate admin policy; dashboard inline JS → `json_script` + static file | `1ef82a5` | Chrome: charts render; injected inline script blocked; admin works | `CSP_REPORT_ONLY=True` for staged rollout. Admin keeps `'unsafe-inline'` scripts (Jazzmin). |
+
+All limits use the default per-process LocMem cache. Configure a shared `CACHES` backend in production so limits hold across workers and survive eviction.
+
 ## Privacy and data handling
 - **Minimized:** clicks store no IP, user agent, referrer or geo. The landing page and README claim geographic/referrer analytics that **do not exist**. Don't add raw IP collection without a privacy review.
 - **Transient:** throttle keys hold IP and username in process memory for at most 15 minutes. They are not persisted or logged.
@@ -75,7 +91,7 @@ App      ──► [B5 data]     SQLite (local/staging) / PostgreSQL (production
 - Rate limits use per-process LocMem: limits are per worker, and counters can be evicted (300-entry default cull). Use a shared cache (database or Redis) in production for reliable limits.
 - No password reset or email verification, so users who forget their password are locked out and email addresses are unverified.
 - No backup/restore evidence. Production topology (proxy/TLS) is unknown, which is why F3's fix is opt-in configuration.
-- Sign-off: **pending project owner** for the fix plan, F5 semantics, F11 rotation, and F10/F12 approach.
+- Sign-off: **pending project owner**: F5 default (30/min) is a product trade-off, F11 rotation is outstanding, F12 abuse handling needs an owner, and deployment must set `TRUSTED_PROXY_COUNT` / real `ALLOWED_HOSTS` / shared `CACHES`.
 
 ## Probing constraints followed
 Local throwaway DB and test client only. No production or network targets, no brute force against real hosts, no data dumps. Secret values are not reproduced. ASVS IDs come from the official v5.0.0 sources.
