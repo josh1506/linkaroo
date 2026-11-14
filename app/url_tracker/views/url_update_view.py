@@ -11,5 +11,8 @@ class UrlUpdateView(LoginRequiredMixin, generic.UpdateView):
     form_class = CreateURLForm
     template_name = 'app/url_tracker/update_url/index.html'
 
+    def get_queryset(self):
+        return self.model.objects.filter(owner=self.request.user)
+
     def get_success_url(self):
         return reverse_lazy('url_tracker:details', kwargs={'pk': self.object.id})

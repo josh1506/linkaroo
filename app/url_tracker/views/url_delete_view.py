@@ -8,3 +8,6 @@ from app.url_tracker.models import models_url
 class UrlDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = models_url.URL
     success_url = reverse_lazy("url_tracker:list")
+
+    def get_queryset(self):
+        return self.model.objects.filter(owner=self.request.user)
