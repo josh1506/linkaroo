@@ -40,7 +40,7 @@ The code-level evidence is strong: 78 tests, every CI step passes locally, secur
 | Wrong owner / anonymous / non-staff | Security | 404 / login redirect / no admin | `ObjectAuthorizationTests` PASS |
 | Malformed input (schemes, aliases, long links, XSS titles) | Integration | Safe validation error, no 500 | `DestinationValidationTests`, `AliasValidationTests`, `test_create_rejects_link_over_2048`, XSS escape test PASS |
 | Abuse: brute force, spraying, sign-up floods, click inflation | Security | 429 / capped | `AuthenticationAbuseTests`, `ClickRecordingAbuseTests` PASS |
-| Concurrent / retried request | Integration | Correct under retries | Migration retry after lock timeout rehearsed. **Not covered:** concurrent alias creation race (unique constraint protects data; the user would see a 500, not a form error), accepted risk A8 |
+| Concurrent / retried request | Integration | Correct under retries | Migration retry after lock timeout rehearsed. Concurrent alias race: form error, no 500 (`AliasRaceTests`) |
 | Small screens / keyboard / reduced motion | UX/a11y | Usable at 320 px, focus visible, no motion | `test_ux.py` (10) PASS; screenshot audit 0 contrast failures; no animations exist. **Not run:** axe-core, real screen reader, real devices (A3) |
 | Performance | Perf | No regression | Query budgets asserted (`QueryBudgetTests`); benchmark above |
 | Migration forward / abort / back | Recovery | Safe | Rehearsed on PostgreSQL 17 (5 scenarios) |
@@ -70,7 +70,7 @@ The code-level evidence is strong: 78 tests, every CI step passes locally, secur
 | A5 | HSTS off; CSP in enforce mode by default | Start with `CSP_REPORT_ONLY=True` on staging/production, then enforce; ramp HSTS after TLS is confirmed |
 | A6 | Malicious destinations behind the short domain (phishing) | Abuse reporting and link-disable procedure needed (threat model F12) |
 | A7 | Google Charts loaded from a third party | CSP-allowlisted; pin or self-host later |
-| A8 | Concurrent creation of the same alias: one request gets a 500 (unique constraint holds) | Low likelihood; handle `IntegrityError` as a form error later |
+| ~~A8~~ | ~~Concurrent creation of the same alias gave a 500~~ | **Resolved:** `AliasConflictMixin` turns the constraint violation into a form error (`AliasRaceTests`, reproduced first) |
 
 ## 3. Production configuration (all documented in `.env.example`; enforced by `test_config.py`)
 

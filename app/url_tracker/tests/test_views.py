@@ -205,6 +205,34 @@ class AliasValidationTests(Base):
         self.assertEqual(self.client.get("/old alias!/").status_code, 302)
 
 
+class AliasRaceTests(Base):
+    """Release checklist A8: a concurrent request takes the alias between validation and save."""
+
+    def setUp(self):
+        self.client.login(username="alice", password="pw-Alice-123!")
+
+    def _race(self):
+        # Simulate the race: uniqueness check passes (as if bob's row didn't exist yet), DB constraint still fires.
+        return mock.patch("app.url_tracker.forms.create_url_form.CreateURLForm.validate_unique", lambda self: None)
+
+    def test_create_race_is_a_form_error_not_500(self):
+        with self._race():
+            r = self.client.post(reverse("url_tracker:create"),
+                                 {"link": "https://example.com/x", "title": "Racer", "custom_url": "bob-link", "description": ""})
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("This alias was just taken", r.content.decode())
+        self.assertFalse(URL.objects.filter(title="Racer").exists())
+        self.assertEqual(URL.objects.get(custom_url="bob-link").owner, self.bob)
+
+    def test_update_race_is_a_form_error_not_500(self):
+        with self._race():
+            r = self.client.post(reverse("url_tracker:update", kwargs={"pk": self.a_url.pk}),
+                                 {"link": "https://example.com/a", "title": "A", "custom_url": "bob-link", "description": ""})
+        self.assertEqual(r.status_code, 200)
+        self.a_url.refresh_from_db()
+        self.assertEqual(self.a_url.custom_url, "alice-link")
+
+
 class CrossUserAccessTests(Base):
     """Security AC1: users cannot read, modify or delete another user's URL."""
 
