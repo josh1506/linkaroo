@@ -1,3 +1,7 @@
+import json
+from datetime import datetime, timezone as dt_timezone
+from unittest import mock
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -100,6 +104,58 @@ class OwnerFlowTests(Base):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.context["top_links"], [
             {"id": str(self.a_url.id), "link": self.a_url.link, "title": "A", "total_clicks": 2}])
+
+
+class AnalyticsDayBucketTests(Base):
+    """Charts must label days in settings.TIME_ZONE (Asia/Manila), the same zone clicks are bucketed in."""
+
+    def test_click_after_local_midnight_counts_on_local_today(self):
+        # 01:00 Manila on Mar 10 == 17:00 UTC on Mar 09 (date far from fixture creation).
+        early_morning = datetime(2030, 3, 9, 17, 0, tzinfo=dt_timezone.utc)
+        with mock.patch("django.utils.timezone.now", return_value=early_morning):
+            fresh = URL.objects.create(owner=self.alice, link="https://example.com/t", title="T")
+            self.client.get(f"/{fresh.custom_url}/")
+            self.client.login(username="alice", password="pw-Alice-123!")
+            ctx = self.client.get(reverse("url_tracker:overview")).context
+
+        clicks = json.loads(ctx["total_clicks_data"])
+        header, today = clicks[0], clicks[-1]
+        self.assertEqual(today[0], "Mar 10")
+        self.assertEqual(today[header.index("T")], 1)
+        self.assertEqual(sum(row[header.index("T")] for row in clicks[1:]), 1)
+
+        links = json.loads(ctx["total_links_data"])
+        self.assertEqual(links[-1][:2], ["Mar 10", 1])
+
+    def test_chart_totals_match_raw_rows(self):
+        for _ in range(3):
+            self.client.get("/alice-link/")
+        self.client.login(username="alice", password="pw-Alice-123!")
+        ctx = self.client.get(reverse("url_tracker:overview")).context
+        clicks = json.loads(ctx["total_clicks_data"])
+        col = clicks[0].index("A")
+        self.assertEqual(sum(r[col] for r in clicks[1:]), URLTracker.objects.filter(url=self.a_url).count())
+        self.assertEqual(ctx["latest_total_clicks"], ctx["total_clicks_data"])
+        self.assertEqual(json.loads(ctx["total_active_url"]), [["Active", "Inactive"], ["Active", 1], ["Inactive", 0]])
+
+
+class QueryBudgetTests(Base):
+    """Dashboard/redirect query counts must not grow with the number of links."""
+
+    def test_overview_query_count_constant(self):
+        self.client.login(username="alice", password="pw-Alice-123!")
+        self.client.get(reverse("url_tracker:overview"))  # warm session
+        with self.assertNumQueries(4):  # session, user, urls+counts, grouped clicks
+            self.client.get(reverse("url_tracker:overview"))
+        for i in range(10):
+            u = URL.objects.create(owner=self.alice, link=f"https://example.com/{i}", title=f"T{i}")
+            self.client.get(f"/{u.custom_url}/")
+        with self.assertNumQueries(4):
+            self.client.get(reverse("url_tracker:overview"))
+
+    def test_redirect_two_queries(self):
+        with self.assertNumQueries(2):  # lookup + insert
+            self.client.get("/alice-link/")
 
 
 class AliasValidationTests(Base):

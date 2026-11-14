@@ -11,4 +11,4 @@ class UrlTrackerListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return super().get_queryset().filter(url_owner=self.request.user.pk)
+        return super().get_queryset().filter(url_owner=self.request.user.pk).select_related('url')
