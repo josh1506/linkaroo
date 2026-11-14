@@ -1,15 +1,15 @@
 from .base import *
 import os
-from dotenv import load_dotenv
 
-dotenv_path = os.path.join(os.path.abspath(__file__), '.env')
-load_dotenv()
-
-SECRET_KEY = os.environ.get('SECRET_KEY')
 ALLOWED_HOSTS = ["*"]
 
-DEBUG = os.environ.get('DEBUG')
-PRODUCTION = os.environ.get('PRODUCTION')
+# Plain-http runserver: relax the secure-by-default transport settings from base.py.
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = False
+
+# Developer tooling, never loaded outside local.
+INSTALLED_APPS += ['debug_toolbar']
+MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 
 # Database
