@@ -9,7 +9,7 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(" ")
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('DB_NAME', 'linkaroo'),
         'USER': os.environ.get('DB_USER', 'linkaroouser'),
         'PASSWORD': os.environ['DB_PASSWORD'],  # required; never commit a value

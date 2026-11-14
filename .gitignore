@@ -60,6 +60,8 @@ target/
 
 # pyenv
 .python-version
+# Tracked on purpose: the project runtime pin, used by CI (setup-python python-version-file).
+!/.python-version
 
 # celery beat schedule file
 celerybeat-schedule

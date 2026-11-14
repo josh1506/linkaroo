@@ -19,11 +19,19 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version-file: .python-version
           cache: pip
-          cache-dependency-path: requirements/*.txt
+          cache-dependency-path: requirements/*.lock
       - name: Install
-        run: pip install -r requirements/local.txt -r requirements/production.txt pip-audit
+        # Hash-locked install: CI tests exactly what production installs (regenerate locks with the command in their header).
+        run: |
+          pip install --require-hashes -r requirements/dev.lock
+          pip install pip-audit
+      - name: Lockfiles match requirements
+        run: |
+          pip install uv
+          uv pip compile requirements/production.txt --universal --python-version 3.12 --generate-hashes -o /tmp/production.lock -q
+          diff <(grep -v '^#' requirements/production.lock) <(grep -v '^#' /tmp/production.lock)
       - name: Django system check
         run: python manage.py check --fail-level ERROR
       - name: Migrations are committed
@@ -40,4 +48,5 @@ jobs:
           python manage.py check --deploy --settings=config.settings.production 2>&1 | tee deploy.txt
           if grep -E "security\.[WE][0-9]+" deploy.txt | grep -v "security.W004"; then exit 1; fi
       - name: Dependency audit
-        run: pip-audit -r requirements/production.txt
+        # pip-audit's database can lag vendor releases: also follow Django's security release notes.
+        run: pip-audit -r requirements/production.lock --require-hashes
