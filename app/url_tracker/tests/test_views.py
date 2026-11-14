@@ -102,6 +102,40 @@ class OwnerFlowTests(Base):
             {"id": str(self.a_url.id), "link": self.a_url.link, "title": "A", "total_clicks": 2}])
 
 
+class AliasValidationTests(Base):
+    def setUp(self):
+        self.client.login(username="alice", password="pw-Alice-123!")
+
+    def post_create(self, alias):
+        return self.client.post(reverse("url_tracker:create"),
+                                {"link": "https://example.com/x", "title": "X", "custom_url": alias, "description": ""})
+
+    def post_update(self, url, alias):
+        return self.client.post(reverse("url_tracker:update", kwargs={"pk": url.pk}),
+                                {"link": url.link, "title": url.title, "custom_url": alias, "description": ""})
+
+    def test_rejects_reserved_slash_space_and_too_long(self):
+        for alias in ["admin", "Auth", "urls", "a/b", "has space", "x" * 65]:
+            self.assertEqual(self.post_create(alias).status_code, 200, alias)
+        self.assertFalse(URL.objects.filter(title="X").exists())
+
+    def test_accepts_slug_alias_and_redirects(self):
+        self.assertEqual(self.post_create("My_link-2024").status_code, 302)
+        self.assertEqual(self.client.get("/My_link-2024/")["Location"], "https://example.com/x")
+
+    def test_blank_alias_on_edit_keeps_existing_link(self):
+        self.post_update(self.a_url, "")
+        self.a_url.refresh_from_db()
+        self.assertEqual(self.a_url.custom_url, "alice-link")
+
+    def test_legacy_alias_outside_new_rules_still_editable_and_redirects(self):
+        legacy = URL.objects.create(owner=self.alice, link="https://example.com/l", title="L", custom_url="old alias!")
+        self.assertEqual(self.post_update(legacy, "old alias!").status_code, 302)
+        legacy.refresh_from_db()
+        self.assertEqual(legacy.custom_url, "old alias!")
+        self.assertEqual(self.client.get("/old alias!/").status_code, 302)
+
+
 class CrossUserAccessTests(Base):
     """Security AC1: users cannot read, modify or delete another user's URL."""
 
