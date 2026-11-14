@@ -74,7 +74,6 @@ class ObjectAuthorizationTests(SecurityBase):
         u = User.objects.get(username="mallory")
         self.assertFalse(u.is_staff or u.is_superuser)
 
-    @expectedFailure  # F7: tracker list filters on denormalized url_owner, which goes stale on reassignment
     def test_previous_owner_loses_click_history_after_reassignment(self):
         link = URL.objects.create(owner=self.alice, link="https://example.com/m", title="Moved", custom_url="moved")
         self.client.get("/moved/")
@@ -131,7 +130,6 @@ class AuthenticationAbuseTests(SecurityBase):
             r = victim.post("/auth/login/", {"username": "alice", "password": "Alice-pass-123"})
             self.assertEqual(r.status_code, 302)
 
-    @expectedFailure  # F4: unlimited account creation from one client (phishing-link farming)
     def test_signup_rate_limited_per_client(self):
         c = self.client_class(REMOTE_ADDR="203.0.113.10")
         codes = [c.post("/auth/signup/", {"username": f"bot{i}", "first_name": "B", "last_name": "B",
@@ -159,6 +157,30 @@ class AuthenticationAbuseTests(SecurityBase):
         b = self.client.post("/auth/login/", {"username": "no-such-user", "password": "wrong"}).content
         strip = lambda html: html.decode().split("csrfmiddlewaretoken")[0].replace("no-such-user", "alice")
         self.assertEqual(strip(a), strip(b))
+
+
+class ClickRecordingAbuseTests(SecurityBase):
+    """ASVS 2.4.1 / 2.3.2 — F5: anonymous click inflation. Redirects are never blocked; recording is capped."""
+
+    def test_clicks_recorded_up_to_limit_per_client_but_every_visit_redirects(self):
+        c = self.client_class(REMOTE_ADDR="203.0.113.11")
+        with self.settings(CLICK_RECORD_LIMIT_PER_MINUTE=10):
+            codes = [c.get("/bob-link/").status_code for _ in range(25)]
+        self.assertEqual(codes, [302] * 25)
+        self.assertEqual(URLTracker.objects.filter(url=self.b_url).count(), 10)
+
+    def test_other_clients_still_counted(self):
+        with self.settings(CLICK_RECORD_LIMIT_PER_MINUTE=2):
+            for ip in ["203.0.113.1", "203.0.113.2", "203.0.113.3"]:
+                for _ in range(3):
+                    self.client_class(REMOTE_ADDR=ip).get("/bob-link/")
+        self.assertEqual(URLTracker.objects.filter(url=self.b_url).count(), 6)
+
+    def test_limit_zero_records_every_click(self):
+        with self.settings(CLICK_RECORD_LIMIT_PER_MINUTE=0):
+            for _ in range(40):
+                self.client.get("/bob-link/")
+        self.assertEqual(URLTracker.objects.filter(url=self.b_url).count(), 40)
 
 
 class DestinationValidationTests(SecurityBase):
