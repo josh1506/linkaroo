@@ -12,7 +12,7 @@ ALIAS_MAX_LENGTH = 64
 
 
 class CreateURLForm(forms.ModelForm):
-    link = forms.URLField(required=True, widget=forms.TextInput(attrs={'placeholder': 'URL/Link', 'class': 'form-control', 'autofocus': 'autofocus'}))
+    link = forms.URLField(required=True, assume_scheme='https', widget=forms.TextInput(attrs={'placeholder': 'URL/Link', 'class': 'form-control', 'autofocus': 'autofocus'}))
     title = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Link Title', 'class': 'form-control'}))
     custom_url = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Insert custom URL (optional)', 'class': 'form-control'}))
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': 'Insert link description (optional)', 'class': 'form-control'}))

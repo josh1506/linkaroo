@@ -199,9 +199,11 @@ class DestinationValidationTests(SecurityBase):
             self.create(link)
         self.assertFalse(URL.objects.filter(title="T").exists())
 
-    def test_scheme_relative_input_is_stored_as_plain_http(self):
-        self.create("//evil.example/", "rel")
-        self.assertEqual(URL.objects.get(custom_url="rel").link, "http://evil.example/")
+    def test_scheme_less_input_defaults_to_https(self):
+        self.create("example.org/page", "bare")
+        self.create("//example.net/", "rel")
+        self.assertEqual(URL.objects.get(custom_url="bare").link, "https://example.org/page")
+        self.assertEqual(URL.objects.get(custom_url="rel").link, "https://example.net/")
 
     def test_only_http_https_destinations_accepted(self):
         self.create("ftps://example.com/f", "f1")
