@@ -1,26 +1,47 @@
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
 from django.core.cache import cache
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.urls import reverse_lazy
 
-# ponytail: Django's default per-process LocMemCache, so the limit is per worker; configure a shared CACHES (e.g. Redis/DB) for multi-worker deploys.
-MAX_FAILURES = 5
+from app.utils.throttle import client_ip, hit, hits
+
 LOCK_SECONDS = 15 * 60
+MAX_ACCOUNT_FAILURES = 5   # per client + username: stops guessing one account
+MAX_CLIENT_FAILURES = 30   # per client, any username: stops password spraying
 
 
-def _failure_key(request):
-    # Keyed on IP + username: a bad actor can't lock a victim out from everywhere, and IP rotation alone doesn't reset one account.
+def _keys(request):
+    ip = client_ip(request)
     username = request.POST.get('username', '').strip().lower()
-    return f"login-failures:{request.META.get('REMOTE_ADDR', '')}:{username}"
+    return f"login-failures:{ip}:{username}", f"login-failures:{ip}"
 
 
-class ThrottledAuthenticationForm(AuthenticationForm):
+class ThrottledLoginMixin:
+    """Lockout enforced inside the form, so every login entrypoint using it (site and admin) is covered."""
+
     def clean(self):
-        # Check before super().clean(), which calls authenticate(); a locked attempt never tests the password.
-        if cache.get(_failure_key(self.request), 0) >= MAX_FAILURES:
+        account_key, client_key = _keys(self.request)
+        # Checked before super().clean(), which calls authenticate(): a locked attempt never tests the password.
+        if hits(account_key) >= MAX_ACCOUNT_FAILURES or hits(client_key) >= MAX_CLIENT_FAILURES:
             raise ValidationError("Too many failed login attempts. Please try again in 15 minutes.", code="throttled")
-        return super().clean()
+        try:
+            cleaned = super().clean()
+        except ValidationError:
+            hit(account_key, LOCK_SECONDS)
+            hit(client_key, LOCK_SECONDS)
+            raise
+        cache.delete(account_key)
+        return cleaned
+
+
+class ThrottledAuthenticationForm(ThrottledLoginMixin, AuthenticationForm):
+    pass
+
+
+class ThrottledAdminAuthenticationForm(ThrottledLoginMixin, AdminAuthenticationForm):
+    pass
 
 
 class CustomLoginView(LoginView):
@@ -39,16 +60,8 @@ class CustomLoginView(LoginView):
 
         return form
 
-    def form_valid(self, form):
-        cache.delete(_failure_key(self.request))
-        return super().form_valid(form)
-
     def form_invalid(self, form):
         response = super().form_invalid(form)
         if form.has_error(NON_FIELD_ERRORS, 'throttled'):
             response.status_code = 429
-        else:
-            key = _failure_key(self.request)
-            cache.add(key, 0, LOCK_SECONDS)
-            cache.incr(key)
         return response

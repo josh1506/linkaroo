@@ -113,19 +113,16 @@ class AuthenticationAbuseTests(SecurityBase):
         r = self.client.post("/auth/login/", {"username": "alice", "password": "Alice-pass-123"})
         self.assertEqual(r.status_code, 429)
 
-    @expectedFailure  # F1: /admin/login/ bypasses the throttle entirely (highest-privilege accounts)
     def test_admin_login_locks_after_5_failures(self):
         self._fail(self.client, "/admin/login/", "staffer", 5)
         self.client.post("/admin/login/?next=/admin/", {"username": "staffer", "password": "Staff-pass-123"})
         self.assertNotIn("_auth_user_id", self.client.session)
 
-    @expectedFailure  # F2: no per-client cap, so one IP can spray a password across unlimited usernames
     def test_password_spraying_capped_per_client(self):
         c = self.client_class(REMOTE_ADDR="203.0.113.9")
         codes = [c.post("/auth/login/", {"username": f"user{i}", "password": "Summer2026!"}).status_code for i in range(60)]
         self.assertIn(429, codes)
 
-    @expectedFailure  # F3: behind a reverse proxy every client shares REMOTE_ADDR, so an attacker can lock out any user
     def test_lockout_of_one_client_does_not_lock_other_clients_behind_proxy(self):
         with self.settings(TRUSTED_PROXY_COUNT=1):
             attacker = self.client_class(REMOTE_ADDR="10.0.0.1", HTTP_X_FORWARDED_FOR="198.51.100.66")
@@ -141,6 +138,20 @@ class AuthenticationAbuseTests(SecurityBase):
                                           "email": f"b{i}@example.com", "password1": "Bot-pass-98765",
                                           "password2": "Bot-pass-98765"}).status_code for i in range(20)]
         self.assertIn(429, codes)
+
+    def test_spoofed_forwarded_for_ignored_without_trusted_proxy(self):
+        # Default TRUSTED_PROXY_COUNT=0: rotating X-Forwarded-For must not reset the per-client lockout.
+        for i in range(5):
+            self.client_class(REMOTE_ADDR="198.51.100.7", HTTP_X_FORWARDED_FOR=f"192.0.2.{i}").post(
+                "/auth/login/", {"username": "alice", "password": "wrong"})
+        r = self.client_class(REMOTE_ADDR="198.51.100.7", HTTP_X_FORWARDED_FOR="192.0.2.99").post(
+            "/auth/login/", {"username": "alice", "password": "Alice-pass-123"})
+        self.assertEqual(r.status_code, 429)
+
+    def test_admin_login_still_works_for_staff(self):
+        r = self.client.post("/admin/login/?next=/admin/", {"username": "staffer", "password": "Staff-pass-123"})
+        self.assertEqual(r.status_code, 302)
+        self.assertIn("_auth_user_id", self.client.session)
 
     def test_failed_login_message_does_not_reveal_whether_user_exists(self):  # ASVS 6.3.8
         a = self.client.post("/auth/login/", {"username": "alice", "password": "wrong"}).content

@@ -39,6 +39,14 @@ SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))  # raise g
 if env_bool('BEHIND_TLS_PROXY'):
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Number of reverse proxies in front of the app that append to X-Forwarded-For. 0 = ignore the header (it is
+# client-spoofable); set to the real count behind a proxy, or every client shares one rate-limit bucket.
+TRUSTED_PROXY_COUNT = int(os.environ.get('TRUSTED_PROXY_COUNT', '0'))
+
+# Clicks recorded per client per link per minute; the redirect itself is never blocked. 0 = record every click.
+CLICK_RECORD_LIMIT_PER_MINUTE = int(os.environ.get('CLICK_RECORD_LIMIT_PER_MINUTE', '30'))
+SIGNUPS_PER_CLIENT_PER_HOUR = int(os.environ.get('SIGNUPS_PER_CLIENT_PER_HOUR', '5'))
+
 
 # Application definition
 
