@@ -258,7 +258,9 @@ class ContentSecurityPolicyTests(SecurityBase):
     def test_dashboard_has_no_inline_executable_script(self):
         self.client.force_login(self.alice)
         html = self.client.get("/urls/").content.decode()
-        for tag in re.findall(r"<script[^>]*>", html):
+        tags = re.findall(r"<script\b[^>]*>", html)
+        self.assertGreaterEqual(len(tags), 5)  # guard: the regex must actually find the page scripts
+        for tag in tags:
             self.assertTrue("src=" in tag or 'type="application/json"' in tag, tag)
 
     def test_link_title_cannot_break_out_of_chart_data(self):

@@ -4,20 +4,22 @@
     <div class="row">
         <div class="d-flex justify-content-center align-items-center gap-2">
             <div>
-                <img src="{% static 'images/logo.svg' %}" alt="logo" style="width: 3em"/>
+                <img src="{% static 'images/logo.svg' %}" alt="" style="width: 3em"/>
             </div>
             <span class="fs-2">Linkaroo</span>
         </div>
     </div>
+    {% with section=request.resolver_match.url_name %}
+    <nav aria-label="Main" class="layout-transparent">
     <ul class="row list-unstyled fs-5 my-4 gap-2">
         <li>
-            <a class="text-decoration-none text-white" href="{% url 'url_tracker:overview' %}">Overview</a>
+            <a class="text-decoration-none text-white" href="{% url 'url_tracker:overview' %}"{% if section == 'overview' %} aria-current="page"{% endif %}>Overview</a>
         </li>
         <li>
-            <a class="text-decoration-none text-white" href="{% url 'url_tracker:list' %}">Manage URL</a>
+            <a class="text-decoration-none text-white" href="{% url 'url_tracker:list' %}"{% if section == 'list' or section == 'create' or section == 'details' or section == 'update' %} aria-current="page"{% endif %}>Manage URL</a>
         </li>
         <li>
-            <a class="text-decoration-none text-white" href="{% url 'url_tracker:tracker-list' %}">URL Tracker</a>
+            <a class="text-decoration-none text-white" href="{% url 'url_tracker:tracker-list' %}"{% if section == 'tracker-list' %} aria-current="page"{% endif %}>URL Tracker</a>
         </li>
         <li>
             <form action="{% url 'users:logout' %}" method="post">
@@ -26,6 +28,8 @@
             </form>
         </li>
     </ul>
+    </nav>
+    {% endwith %}
     <div class="text-white p-4 rounded-4 w-75 row position-absolute bottom-0 mb-4 bg-secondary">
         <p class="">Have any problems with manage your dashboard? Try to contact the Customer Support</p>
         <button class="btn btn-default">Contact Us</button>

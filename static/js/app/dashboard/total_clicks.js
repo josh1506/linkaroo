@@ -1,6 +1,7 @@
 google.charts.setOnLoadCallback(drawTotalClicksChart);
 
 function drawTotalClicksChart() {
+    if (!document.getElementById('chart_div')) return;  // empty state rendered instead
     var data = google.visualization.arrayToDataTable(totalClicks);
 
     var options = {

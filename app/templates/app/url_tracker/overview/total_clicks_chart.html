@@ -1,8 +1,12 @@
 <div class="col shadow m-3 rounded-4 p-4 bg-default w-25">
     <div>
-        <h5>Total Clicks</h5>
+        <h2 class="h5">Total Clicks</h2>
     </div>
     <div>
-        <div id="chart_div"></div>
+        {% if has_links %}
+            <div id="chart_div" class="chart" role="img" aria-label="Clicks per link per day, last 7 days">Loading chart…</div>
+        {% else %}
+            {% include 'app/components/empty_state.html' with message="No clicks yet." show_cta=False %}
+        {% endif %}
     </div>
 </div>

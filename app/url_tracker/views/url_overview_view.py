@@ -23,5 +23,7 @@ class UrlOverviewTemplateView(LoginRequiredMixin, generic.TemplateView):
         kwargs['latest_total_clicks'] = clicks_7_days  # both charts used identical data; computed once
         kwargs['total_links_data'] = get_links_created_day_range(user_url, 7)
         kwargs['total_clicks_data'] = clicks_7_days
+        # Charts can't be drawn without at least one link (no data columns); templates show an empty state instead.
+        kwargs['has_links'] = bool(user_url)
 
         return kwargs

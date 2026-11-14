@@ -1,6 +1,10 @@
 <div class="rounded-4 shadow p-4 my-4 bg-default">
-    <h5>Total Active URL</h5>
+    <h2 class="h5">Total Active URL</h2>
     <div class="overflow-hidden">
-        <div id="total-active-url-chart"></div>
+        {% if has_links %}
+            <div id="total-active-url-chart" class="chart" role="img" aria-label="Share of links with at least one click">Loading chart…</div>
+        {% else %}
+            {% include 'app/components/empty_state.html' with message="No links yet." show_cta=False %}
+        {% endif %}
     </div>
 </div>

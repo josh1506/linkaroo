@@ -42,5 +42,28 @@
 
 **Explicitly not doing:** new fonts, color palette, layout, IA or copy rewrites; animations (none are needed, and motion would be decorative); changes to the dead promo buttons (U13 needs a product decision).
 
-## Results
-See the "Results" section appended after implementation.
+## Results (implemented 2026-11-14, branch `upgrade/upg-001`, not deployed)
+
+**Audit, before → after** (page-views affected, out of 30 = 15 states × desktop/phone):
+
+| Check | Before | After | Note |
+|---|---|---|---|
+| WCAG contrast failures | 28 | **0** | |
+| Skip link missing | 30 | **0** | |
+| Heading level skipped / no h1 | 22 / 10 | **0 / 0** | Tags fixed, visual size kept via `.h2`/`.h4`/`.h5` |
+| Non-descriptive or empty `img` | 22 / 2 | **0 / 0** | |
+| No nav landmark / no main | 12 / 2 | **0 / 0** | `<nav>` uses `display: contents`, so no layout change |
+| Nav without current page | 22 | 4 | Remaining: landing/404 in-page anchors (no "current page" concept) |
+| Table without caption | 12 | 2 | Remaining: Google Charts' internal hidden tables |
+| Target under 24 px | 0 | 30 | False positive: the skip link while visually hidden (full size on focus) |
+| Buttons that do nothing | 20 | 20 | U13, product decision, intentionally untouched |
+
+**Pixel diff vs baseline** (`tools/ux-audit/diff.sh`, % of pixels changed by >32/255):
+- Populated pages at 1440 px: **0.36%** (dashboard, create, detail, update), 0.01% (login/signup). The changes are the one-shade-deeper primary green, dark ink on light-green cards, the bold current-nav item and Logout alignment. Layout is unchanged.
+- Intended large changes: broken-link 404 (99.96%, new branded page); empty dashboard (10.9%, messages replace chart errors); empty lists; form-error state (3.1%, red borders and error text); landing (7.8%, four empty image placeholders removed so sections move up); `list` (2.6%, single-page pagination hidden).
+- Phones/tablet (<992 px): 6–25%, from symmetric gutters and the empty states.
+
+**Tests:** `app/url_tracker/tests/test_ux.py` (10 tests: empty states, labelled charts, pagination `aria-current`, branded 404, context-free 500, skip link and one h1 per page, current section per route, image alt). Suite: **73/73 pass** with DeprecationWarnings as errors.
+While doing this I found and fixed a vacuous security test: an escaped `` had become a literal backspace in a regex, so `test_dashboard_has_no_inline_executable_script` checked nothing. It now asserts that scripts are found, and it fails when an inline script is injected (verified).
+
+**Follow-ups (not done, need a decision):** U13 dead "Subscribe Now"/"Contact Us" buttons. Chart colors are Google defaults (blue/red/orange), not brand green. Google Charts still loads from a third party. A real screen-reader pass (NVDA/VoiceOver) and an axe-core run are still owed.
