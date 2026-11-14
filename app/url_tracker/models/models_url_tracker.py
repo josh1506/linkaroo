@@ -28,5 +28,5 @@ class URLTracker(Model):
         return self.url.title
 
     def save(self, *args, **kwargs):
-        self.url_owner = self.url.owner
+        self.url_owner_id = self.url.owner_id  # same value, without fetching the User row on every click
         super().save(*args, **kwargs)

@@ -1,14 +1,7 @@
 from .base import *
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
-
-SECRET_KEY = os.environ.get('SECRET_KEY')
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(" ")
-
-DEBUG = os.environ.get('DEBUG')
-PRODUCTION = os.environ.get('PRODUCTION')
 
 
 # Database
@@ -16,12 +9,12 @@ PRODUCTION = os.environ.get('PRODUCTION')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': "linkaroo",
-        'USER': "linkaroouser",
-        'PASSWORD': "password",
-        'HOST': "localhost",
-        'PORT': "5432",
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'linkaroo'),
+        'USER': os.environ.get('DB_USER', 'linkaroouser'),
+        'PASSWORD': os.environ['DB_PASSWORD'],  # required; never commit a value
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 

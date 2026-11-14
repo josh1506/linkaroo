@@ -2,8 +2,8 @@
 
 {% block 'content' %}
     <div class="d-flex h-100 justify-content-center align-items-center my-5">
-        <form class="bg-default rounded-5 p-5 shadow w-25 d-flex flex-column gap-2" method="post">
-            <h2 class="text-center">Register New Account</h2>
+        <form class="auth-card bg-default rounded-5 p-4 p-sm-5 shadow d-flex flex-column gap-2" method="post">
+            <h1 class="h2 text-center">Register New Account</h1>
             {% if form.errors %}
                 <div class="alert alert-danger" role="alert">
                     {% for key, error in form.errors.items %}

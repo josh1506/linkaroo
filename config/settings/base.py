@@ -12,18 +12,43 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os.path
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+load_dotenv()
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1tgdh0cl&588_ifb)i6rnmnxjev4n-zm23i5ydy^@)*(cvf%zd'
+def env_bool(name, default=False):
+    """Parse a boolean env var. A raw string like "False" is truthy, so never use os.environ.get() directly."""
+    return os.environ.get(name, str(default)).strip().lower() in ('1', 'true', 'yes', 'on')
+
+
+# SECURITY WARNING: keep the secret key used in production secret! Required; Django refuses to start without it.
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env_bool('DEBUG')
+PRODUCTION = env_bool('PRODUCTION')
+
+# Transport security: secure by default; local.py relaxes it for plain-http runserver.
+SECURE_SSL_REDIRECT = env_bool('SECURE_SSL_REDIRECT', True)
+SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = env_bool('SECURE_COOKIES', True)
+SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))  # raise gradually after HTTPS is confirmed
+if env_bool('BEHIND_TLS_PROXY'):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Number of reverse proxies in front of the app that append to X-Forwarded-For. 0 = ignore the header (it is
+# client-spoofable); set to the real count behind a proxy, or every client shares one rate-limit bucket.
+TRUSTED_PROXY_COUNT = int(os.environ.get('TRUSTED_PROXY_COUNT', '0'))
+
+# Clicks recorded per client per link per minute; the redirect itself is never blocked. 0 = record every click.
+CLICK_RECORD_LIMIT_PER_MINUTE = int(os.environ.get('CLICK_RECORD_LIMIT_PER_MINUTE', '30'))
+SIGNUPS_PER_CLIENT_PER_HOUR = int(os.environ.get('SIGNUPS_PER_CLIENT_PER_HOUR', '5'))
+
+# Content-Security-Policy (config/middleware.py). True = report-only header, for staged rollout.
+CSP_REPORT_ONLY = env_bool('CSP_REPORT_ONLY')
 
 
 # Application definition
@@ -41,7 +66,6 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'debug_toolbar',
     'django_extensions'
 ]
 
@@ -61,7 +85,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'config.middleware.ContentSecurityPolicyMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -122,3 +146,16 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/auth/login/'
+
+# Errors to stderr in every environment (Django's default only emails ADMINS when DEBUG=False, and none are set,
+# so production 500s were silent). Messages carry paths/status, not request bodies, cookies or credentials.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {'plain': {'format': '%(asctime)s %(levelname)s %(name)s: %(message)s'}},
+    'handlers': {'console': {'class': 'logging.StreamHandler', 'formatter': 'plain'}},
+    'root': {'handlers': ['console'], 'level': os.environ.get('LOG_LEVEL', 'WARNING')},
+    'loggers': {
+        'django': {'handlers': ['console'], 'level': os.environ.get('DJANGO_LOG_LEVEL', 'ERROR'), 'propagate': False},
+    },
+}

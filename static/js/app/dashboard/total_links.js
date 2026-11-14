@@ -1,4 +1,5 @@
 function drawTotalLinksChart() {
+    if (!document.getElementById('total_links_chart')) return;  // empty state rendered instead
     var data = google.visualization.arrayToDataTable([
         ["Year", "Count", { role: "style" } ],
         ...totalLinksData

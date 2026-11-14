@@ -1,14 +1,7 @@
 from .base import *
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
-
-SECRET_KEY = os.environ.get('SECRET_KEY')
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(" ")
-
-DEBUG = os.environ.get('DEBUG')
-PRODUCTION = os.environ.get('PRODUCTION')
 
 
 # Database

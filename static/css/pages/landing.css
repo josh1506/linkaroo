@@ -24,3 +24,33 @@
 .feature-card {
     width: 20em;
 }
+
+
+/* ---- Phones/tablets (UPG-001): hero copy flows below the artwork instead of overlapping it. ---- */
+.feature-card {
+    max-width: 100%;
+}
+
+@media (max-width: 991.98px) {
+    #landing-hero > div {
+        position: static !important;
+        width: auto;
+        padding: 1.5rem;
+    }
+    #landing-hero > div > h1 {
+        font-size: clamp(1.75rem, 6vw, 2.5rem);
+    }
+    #landing-hero > div > p {
+        font-size: 1rem;
+    }
+    #landing-hero > div > a {
+        display: inline-block;
+        font-size: 1.1rem;
+    }
+    #cta > div {
+        width: 100% !important;
+    }
+    #about, #contact, #subscription, #cta {
+        padding: 1.5rem !important;
+    }
+}

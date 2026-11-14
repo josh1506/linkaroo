@@ -9,7 +9,7 @@
 }
 
 .btn-primary, .bg-primary {
-    background: #388E3C !important;
+    background: #2E7D32 !important;
     border-width: 0 !important;
 }
 
@@ -19,3 +19,180 @@
 }
 
 
+
+
+/* ---- Accessibility + responsive layer (UPG-001). Desktop (>=992px) layout unchanged. ---- */
+
+/* Visible keyboard focus everywhere; white ring on the green brand surfaces. */
+:focus-visible {
+    outline: 3px solid #1B5E20;
+    outline-offset: 2px;
+}
+/* Bootstrap's .btn:focus-visible sets outline:0 and custom .btn-default has no focus shadow; restore a ring. */
+body .btn:focus-visible {
+    outline: 3px solid #1B5E20;
+    outline-offset: 2px;
+}
+.bg-primary :focus-visible, .bg-secondary :focus-visible,
+body .bg-primary .btn:focus-visible, body .bg-secondary .btn:focus-visible {
+    outline-color: #FFFFFF;
+}
+
+/* Login / signup card: full width on phones; original 25% width on desktop. */
+.auth-card {
+    width: 100%;
+    max-width: 22rem;
+}
+@media (min-width: 992px) {
+    .auth-card {
+        width: max(25%, 20rem);
+        max-width: none;
+    }
+}
+
+@media (max-width: 991.98px) {
+    /* App shell: let the page scroll and stack sidebar above content. */
+    body.app-shell {
+        overflow: auto !important;
+        height: auto !important;
+    }
+    .app-shell main {
+        flex-wrap: nowrap;
+        margin: 0;
+        padding: 1rem !important;
+        gap: 1rem !important;
+    }
+    .app-shell main, .app-shell .h-100 {
+        height: auto !important;
+    }
+    .app-shell aside ul {
+        flex-direction: row;
+        justify-content: center;
+        margin: 1rem 0 !important;
+    }
+    .app-shell aside ul > li {
+        width: auto;
+    }
+    /* Support blurb (its button has no action yet) would push content a full screen down. */
+    .app-shell aside .position-absolute {
+        display: none !important;
+    }
+}
+
+/* Dashboard chart cards: original 'col w-25' pairing kept on desktop; one per row on phones. */
+@media (max-width: 767.98px) {
+    .app-shell .row > .col.w-25 {
+        flex: 0 0 auto;
+        width: calc(100% - 2rem) !important;
+    }
+}
+
+/* Public navbar: wrap links instead of overflowing on phones. */
+@media (max-width: 767.98px) {
+    body > header.position-fixed {
+        position: static !important;
+        flex-direction: column;
+        padding: .5rem 1rem !important;
+    }
+    body > header nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: .25rem 1rem !important;
+        margin: 0;
+        font-size: 1rem !important;
+    }
+    body > header + main.mt-5 {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+}
+
+
+/* ---- UX refinements (docs/UX_AUDIT.md). Brand palette kept; values chosen for WCAG AA. ---- */
+:root {
+    --lk-primary: #2E7D32;      /* was #388E3C; same family, white text 5.1:1 */
+    --lk-secondary: #8BC34A;    /* unchanged brand light green */
+    --lk-ink: #14301A;          /* text on light green: 6.8:1 (white was 2.1:1) */
+    --lk-danger-text: #B02A37;  /* error text/border on white: 6.5:1 */
+}
+
+/* Text on the light-green surfaces: dark green ink instead of white. */
+.bg-secondary, .bg-secondary.text-white, .bg-secondary .text-white,
+.btn-secondary, .btn-secondary.text-white, .btn-secondary:hover, .btn-secondary:focus-visible {
+    color: var(--lk-ink) !important;
+}
+
+/* Skip link: hidden until focused. */
+.skip-link {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    z-index: 1000;
+    padding: .5rem 1rem;
+    border-radius: .5rem;
+    background: #FFFFFF;
+    color: var(--lk-ink);
+}
+
+/* Current page in the app sidebar. */
+.app-shell aside a[aria-current="page"] {
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+}
+
+/* Field errors: Django already sets aria-invalid / aria-describedby; make them visible too. */
+.form-control[aria-invalid="true"] {
+    border-color: var(--lk-danger-text);
+}
+.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: .25rem 0;
+    color: var(--lk-danger-text);
+    font-size: .875rem;
+}
+
+/* Pagination in brand green instead of Bootstrap blue. */
+.pagination {
+    --bs-pagination-color: var(--lk-primary);
+    --bs-pagination-hover-color: var(--lk-primary);
+    --bs-pagination-active-bg: var(--lk-primary);
+    --bs-pagination-active-border-color: var(--lk-primary);
+    --bs-pagination-focus-box-shadow: none;
+}
+
+/* Charts: reserve the drawn height (no layout jump when Google Charts loads); quiet placeholder text. */
+.chart {
+    min-height: 200px;
+    color: #5C6B5E;
+    font-size: .875rem;
+}
+
+/* Empty states inside cards and tables. */
+.empty-state {
+    padding: 1.5rem 0;
+    color: #4A5A4C;
+    text-align: center;
+}
+
+@media (max-width: 991.98px) {
+    /* Symmetric gutters: content rows used w-100 plus negative margins, leaving 28px left vs 52px right. */
+    .app-shell main .row.w-100 {
+        width: auto !important;
+    }
+}
+
+/* Landmark wrappers that must not change layout (e.g. <nav> around the sidebar list). */
+.layout-transparent {
+    display: contents;
+}
+
+/* Sidebar "Logout" is a POST form button; drop Bootstrap button padding so it aligns with the nav links. */
+.app-shell aside form .btn {
+    padding: 0;
+    border: 0;
+    line-height: inherit;
+    vertical-align: baseline;
+}
