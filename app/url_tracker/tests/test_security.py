@@ -1,10 +1,8 @@
 """Security regression tests (threat model: docs/THREAT_MODEL.md).
 
-Tests marked @expectedFailure document CONFIRMED, not-yet-fixed gaps. When a fix lands the test
-"unexpectedly succeeds" and the marker must be removed in the same change.
+Every finding F1-F9 started as an @expectedFailure test reproducing the gap; markers were removed as fixes landed.
 """
 import inspect
-from unittest import expectedFailure
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -204,17 +202,29 @@ class DestinationValidationTests(SecurityBase):
         self.create("//evil.example/", "rel")
         self.assertEqual(URL.objects.get(custom_url="rel").link, "http://evil.example/")
 
-    @expectedFailure  # F8: ftps:// passes form validation but Django refuses to redirect to it (link is dead, 400)
     def test_only_http_https_destinations_accepted(self):
         self.create("ftps://example.com/f", "f1")
         self.create("ftp://example.com/f", "f2")
         self.assertFalse(URL.objects.filter(custom_url__in=["f1", "f2"]).exists())
 
-    @expectedFailure  # F6: links pointing back at the shortener itself allow redirect loops / click amplification
     def test_destination_on_own_domain_rejected(self):
         with self.settings(ALLOWED_HOSTS=["lnk.example.com"]):
             self.create("https://lnk.example.com/other-alias/", "self-ref")
         self.assertFalse(URL.objects.filter(custom_url="self-ref").exists())
+
+    def test_legacy_destination_stays_editable_if_unchanged_but_cannot_be_newly_set(self):
+        legacy = URL.objects.create(owner=self.alice, link="ftp://example.com/old", title="old", custom_url="legacy")
+        edit = lambda link: self.client.post(f"/urls/update/{legacy.pk}/", {"link": link, "title": "renamed",
+                                                                            "custom_url": "legacy", "description": ""})
+        self.assertEqual(edit("ftp://example.com/old").status_code, 302)
+        legacy.refresh_from_db()
+        self.assertEqual((legacy.title, legacy.link), ("renamed", "ftp://example.com/old"))
+        self.assertEqual(edit("ftp://example.com/other").status_code, 200)
+
+    def test_external_https_destination_accepted_when_own_host_configured(self):
+        with self.settings(ALLOWED_HOSTS=["lnk.example.com"]):
+            self.create("https://example.org/page", "ext")
+        self.assertTrue(URL.objects.filter(custom_url="ext").exists())
 
     def test_existing_links_keep_redirecting_regardless_of_new_rules(self):
         legacy = URL.objects.create(owner=self.bob, link="ftp://example.com/old", title="old", custom_url="legacy-ftp")
@@ -222,7 +232,6 @@ class DestinationValidationTests(SecurityBase):
 
 
 class TokenGenerationTests(TestCase):
-    @expectedFailure  # F9: generated aliases come from random (Mersenne Twister), not a CSPRNG (ASVS 11.5.1)
     def test_generated_alias_uses_csprng(self):
         from app.url_tracker.models import models_url
         src = inspect.getsource(models_url.generate_unique_link)

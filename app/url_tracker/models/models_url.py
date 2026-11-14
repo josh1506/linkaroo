@@ -1,4 +1,4 @@
-import random
+import secrets
 import string
 
 from django.contrib.auth import get_user_model
@@ -17,11 +17,11 @@ def generate_unique_link():
     characters = string.ascii_letters + string.digits
 
     # Generate random character with length of 12
-    custom_url = "".join(random.choice(characters) for _ in range(12))
+    custom_url = "".join(secrets.choice(characters) for _ in range(12))
 
     # Ensure the short link is unique
     while URL.objects.filter(custom_url=custom_url).exists():
-        custom_url = "".join(random.choice(characters) for _ in range(12))
+        custom_url = "".join(secrets.choice(characters) for _ in range(12))
 
     return custom_url
 

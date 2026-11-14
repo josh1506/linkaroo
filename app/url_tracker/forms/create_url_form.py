@@ -1,5 +1,9 @@
+from urllib.parse import urlsplit
+
 from django import forms
+from django.conf import settings
 from django.core.validators import validate_slug
+from django.http.request import validate_host
 from app.url_tracker.models import URL
 
 # First path segments owned by other routes in config/urls.py; an alias here could never be reached.
@@ -16,6 +20,22 @@ class CreateURLForm(forms.ModelForm):
     class Meta:
         model = URL
         fields = ['link', 'title', 'custom_url', 'description']
+
+    def clean_link(self):
+        link = self.cleaned_data['link']
+        # Unchanged destination on edit: keep existing links editable even if they predate these rules.
+        if self.instance.pk and link == self.instance.link:
+            return link
+
+        parts = urlsplit(link)
+        # Django refuses to redirect to ftps (dead link) and browsers dropped FTP: web destinations only (F8).
+        if parts.scheme.lower() not in ('http', 'https'):
+            raise forms.ValidationError("Only http:// and https:// links are supported.")
+        # A link back to this site enables redirect loops that write a click per hop (F6).
+        own_hosts = [h for h in settings.ALLOWED_HOSTS if h != '*']
+        if parts.hostname and validate_host(parts.hostname, own_hosts):
+            raise forms.ValidationError("Links can't point to this site.")
+        return link
 
     def clean_custom_url(self):
         alias = self.cleaned_data['custom_url'].strip()
