@@ -1,7 +1,8 @@
 <form class="d-flex flex-column gap-3 p-4 rounded-4 shadow bg-default" action="{% url 'url_tracker:update' pk=object.pk %}" method="POST">
     {% if form.errors %}
-        <div class="alert alert-danger">
-            <p>{{ form.errors }}</p>
+        <div class="alert alert-danger" role="alert">
+            <p class="mb-0">Please correct the highlighted fields below.</p>
+            {{ form.non_field_errors }}
         </div>
     {% endif %}
 

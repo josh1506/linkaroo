@@ -19,3 +19,90 @@
 }
 
 
+
+
+/* ---- Accessibility + responsive layer (UPG-001). Desktop (>=992px) layout unchanged. ---- */
+
+/* Visible keyboard focus everywhere; white ring on the green brand surfaces. */
+:focus-visible {
+    outline: 3px solid #1B5E20;
+    outline-offset: 2px;
+}
+/* Bootstrap's .btn:focus-visible sets outline:0 and custom .btn-default has no focus shadow; restore a ring. */
+body .btn:focus-visible {
+    outline: 3px solid #1B5E20;
+    outline-offset: 2px;
+}
+.bg-primary :focus-visible, .bg-secondary :focus-visible,
+body .bg-primary .btn:focus-visible, body .bg-secondary .btn:focus-visible {
+    outline-color: #FFFFFF;
+}
+
+/* Login / signup card: full width on phones; original 25% width on desktop. */
+.auth-card {
+    width: 100%;
+    max-width: 22rem;
+}
+@media (min-width: 992px) {
+    .auth-card {
+        width: max(25%, 20rem);
+        max-width: none;
+    }
+}
+
+@media (max-width: 991.98px) {
+    /* App shell: let the page scroll and stack sidebar above content. */
+    body.app-shell {
+        overflow: auto !important;
+        height: auto !important;
+    }
+    .app-shell main {
+        flex-wrap: nowrap;
+        margin: 0;
+        padding: 1rem !important;
+        gap: 1rem !important;
+    }
+    .app-shell main, .app-shell .h-100 {
+        height: auto !important;
+    }
+    .app-shell aside ul {
+        flex-direction: row;
+        justify-content: center;
+        margin: 1rem 0 !important;
+    }
+    .app-shell aside ul > li {
+        width: auto;
+    }
+    /* Support blurb (its button has no action yet) would push content a full screen down. */
+    .app-shell aside .position-absolute {
+        display: none !important;
+    }
+}
+
+/* Dashboard chart cards: original 'col w-25' pairing kept on desktop; one per row on phones. */
+@media (max-width: 767.98px) {
+    .app-shell .row > .col.w-25 {
+        flex: 0 0 auto;
+        width: calc(100% - 2rem) !important;
+    }
+}
+
+/* Public navbar: wrap links instead of overflowing on phones. */
+@media (max-width: 767.98px) {
+    body > header.position-fixed {
+        position: static !important;
+        flex-direction: column;
+        padding: .5rem 1rem !important;
+    }
+    body > header nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: .25rem 1rem !important;
+        margin: 0;
+        font-size: 1rem !important;
+    }
+    body > header + main.mt-5 {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+}

@@ -4,7 +4,7 @@
 
 {% block 'content' %}
     <div class="row">
-        <div class="col-8 d-flex align-items-end justify-content-between">
+        <div class="col-12 col-lg-8 d-flex align-items-end justify-content-between">
             <div>
                 <span>Welcome Back,</span>
                 <h2>{{ user.first_name }} {{ user.last_name }}</h2>
@@ -13,10 +13,10 @@
                 <a class="btn btn-default shadow" href="{% url 'url_tracker:create' %}">Create Link</a>
             </div>
         </div>
-        <div class="col-4 "></div>
+        <div class="col-lg-4"></div>
     </div>
     <div class="row">
-        <div class="col-8">
+        <div class="col-12 col-lg-8">
             {% include 'app/url_tracker/overview/extra_feature_ads.html' %}
 
             <div class="row">
@@ -27,7 +27,7 @@
                 {% include 'app/url_tracker/overview/latest_total_clicks.html' %}
             </div>
         </div>
-        <div class="col-4">
+        <div class="col-12 col-lg-4 mt-3 mt-lg-0">
             {% include 'app/url_tracker/overview/top_links.html' %}
             {% include 'app/url_tracker/overview/total_active_url_chart.html' %}
         </div>
