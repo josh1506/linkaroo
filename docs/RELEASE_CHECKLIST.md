@@ -13,7 +13,7 @@ The code-level evidence is strong: 78 tests, every CI step passes locally, secur
 | Check | Status | Evidence |
 |---|---|---|
 | Scope/diff and code review | **FAIL (B4)** | All 24 commits AI-authored. No human review yet. Per-change reports: `docs/UPG-001-CHANGE-REPORT.md`, `docs/THREAT_MODEL.md`, `docs/UX_AUDIT.md`, `docs/DEPENDENCY_UPGRADE_PLAN.md`, `docs/DATA_MIGRATION_RUNBOOK.md` |
-| Tests | PASS | `python -W error::DeprecationWarning -W error::PendingDeprecationWarning manage.py test`: **78/78**, run twice (79 s each), identical set, 0 skips/xfail, no flakes |
+| Tests | PASS | `python -W error::DeprecationWarning -W error::PendingDeprecationWarning manage.py test`: **78/78** run twice (79 s each, identical set), then **79/79** after adding `test_config.py`, 0 skips/xfail, no flakes |
 | CI | **UNKNOWN (B3)** | `.github/workflows/ci.yml` has **never run** (branch not pushed). Each CI step run locally: check, makemigrations --check, lock in sync, `--require-hashes` install, deploy checklist (only W004 HSTS, intentional), pip-audit: **all PASS** |
 | Build artifacts | PASS | `collectstatic` (production settings) collected 232 files. WSGI app imports under production settings. Stage entrypoint loads. All Python compiles |
 | Lint / typecheck | N/A | None configured in repo (not added: out of scope) |

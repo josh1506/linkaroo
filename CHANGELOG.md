@@ -15,6 +15,6 @@
 - Django 5.0.1 → **5.2.19 LTS** (5.0 was end-of-life with 47 known CVEs); dependencies hash-locked; Python 3.12 pinned.
 - Secrets read from the environment; correct `DEBUG` handling; secure cookies, HTTPS redirect, Content-Security-Policy; errors logged to stderr.
 - Migration `0004_widen_url_link` (metadata-only on PostgreSQL; see `docs/DATA_MIGRATION_RUNBOOK.md`).
-- CI workflow, 78 automated tests, `data_fingerprint` command for backup/restore verification.
+- CI workflow, 79 automated tests, `data_fingerprint` command for backup/restore verification.
 
 See `docs/RELEASE_CHECKLIST.md` for release status (currently **no-go** pending the environment and ownership items listed there).
