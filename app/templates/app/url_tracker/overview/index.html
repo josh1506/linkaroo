@@ -35,18 +35,13 @@
 {% endblock %}
 
 {% block 'extra_scripts' %}
+    {{ latest_total_clicks|json_script:"latest-total-clicks-data" }}
+    {{ total_clicks_data|json_script:"total-clicks-data" }}
+    {{ total_links_data|json_script:"total-links-data" }}
+    {{ total_active_url|json_script:"total-active-url-data" }}
+
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-    <script>
-        google.charts.load('current', {'packages':['corechart']});
-
-        // Variables
-        const latestTotalClicks = JSON.parse("{{ latest_total_clicks|escapejs }}")
-        const totalClicks = JSON.parse("{{ total_clicks_data|escapejs }}")
-        const totalLinksData = JSON.parse("{{ total_links_data|escapejs }}")
-        const totalActiveUrl = JSON.parse("{{ total_active_url|escapejs }}")
-    </script>
-
+    <script type="text/javascript" src="{% static 'js/app/dashboard/init.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/app/dashboard/total_links.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/app/dashboard/total_clicks.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/app/dashboard/latest_clicks.js' %}"></script>

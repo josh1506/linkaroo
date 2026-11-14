@@ -1,4 +1,3 @@
-import json
 from datetime import datetime, timezone as dt_timezone
 from unittest import mock
 
@@ -118,13 +117,13 @@ class AnalyticsDayBucketTests(Base):
             self.client.login(username="alice", password="pw-Alice-123!")
             ctx = self.client.get(reverse("url_tracker:overview")).context
 
-        clicks = json.loads(ctx["total_clicks_data"])
+        clicks = ctx["total_clicks_data"]
         header, today = clicks[0], clicks[-1]
         self.assertEqual(today[0], "Mar 10")
         self.assertEqual(today[header.index("T")], 1)
         self.assertEqual(sum(row[header.index("T")] for row in clicks[1:]), 1)
 
-        links = json.loads(ctx["total_links_data"])
+        links = ctx["total_links_data"]
         self.assertEqual(links[-1][:2], ["Mar 10", 1])
 
     def test_chart_totals_match_raw_rows(self):
@@ -132,11 +131,11 @@ class AnalyticsDayBucketTests(Base):
             self.client.get("/alice-link/")
         self.client.login(username="alice", password="pw-Alice-123!")
         ctx = self.client.get(reverse("url_tracker:overview")).context
-        clicks = json.loads(ctx["total_clicks_data"])
+        clicks = ctx["total_clicks_data"]
         col = clicks[0].index("A")
         self.assertEqual(sum(r[col] for r in clicks[1:]), URLTracker.objects.filter(url=self.a_url).count())
         self.assertEqual(ctx["latest_total_clicks"], ctx["total_clicks_data"])
-        self.assertEqual(json.loads(ctx["total_active_url"]), [["Active", "Inactive"], ["Active", 1], ["Inactive", 0]])
+        self.assertEqual(ctx["total_active_url"], [["Active", "Inactive"], ["Active", 1], ["Inactive", 0]])
 
 
 class QueryBudgetTests(Base):

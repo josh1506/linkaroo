@@ -47,6 +47,9 @@ TRUSTED_PROXY_COUNT = int(os.environ.get('TRUSTED_PROXY_COUNT', '0'))
 CLICK_RECORD_LIMIT_PER_MINUTE = int(os.environ.get('CLICK_RECORD_LIMIT_PER_MINUTE', '30'))
 SIGNUPS_PER_CLIENT_PER_HOUR = int(os.environ.get('SIGNUPS_PER_CLIENT_PER_HOUR', '5'))
 
+# Content-Security-Policy (config/middleware.py). True = report-only header, for staged rollout.
+CSP_REPORT_ONLY = env_bool('CSP_REPORT_ONLY')
+
 
 # Application definition
 
@@ -82,6 +85,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'config.middleware.ContentSecurityPolicyMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

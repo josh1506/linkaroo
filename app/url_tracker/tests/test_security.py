@@ -3,6 +3,7 @@
 Every finding F1-F9 started as an @expectedFailure test reproducing the gap; markers were removed as fixes landed.
 """
 import inspect
+import re
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -229,6 +230,43 @@ class DestinationValidationTests(SecurityBase):
     def test_existing_links_keep_redirecting_regardless_of_new_rules(self):
         legacy = URL.objects.create(owner=self.bob, link="ftp://example.com/old", title="old", custom_url="legacy-ftp")
         self.assertEqual(self.client.get(f"/{legacy.custom_url}/")["Location"], "ftp://example.com/old")
+
+
+class ContentSecurityPolicyTests(SecurityBase):
+    """ASVS 3.4.3 / 3.4.6 — F10: CSP on every response; no inline script on app pages."""
+
+    def directives(self, response):
+        header = response["Content-Security-Policy"]
+        return {d.split()[0]: d.split()[1:] for d in header.split("; ")}
+
+    def test_app_pages_send_strict_script_policy(self):
+        self.client.force_login(self.alice)
+        for path in ["/", "/auth/signup/", "/urls/", "/urls/list/", "/bob-link/"]:
+            d = self.directives(self.client.get(path))
+            self.assertNotIn("'unsafe-inline'", d["script-src"], path)
+            self.assertNotIn("'unsafe-eval'", d["script-src"], path)
+            self.assertEqual(d["frame-ancestors"], ["'none'"], path)
+            self.assertEqual(d["object-src"], ["'none'"], path)
+
+    def test_admin_policy_still_blocks_framing_and_plugins(self):
+        self.client.force_login(self.staff)
+        d = self.directives(self.client.get("/admin/"))
+        self.assertEqual((d["frame-ancestors"], d["object-src"], d["base-uri"]), (["'none'"], ["'none'"], ["'self'"]))
+
+    def test_dashboard_has_no_inline_executable_script(self):
+        self.client.force_login(self.alice)
+        html = self.client.get("/urls/").content.decode()
+        for tag in re.findall(r"<script[^>]*>", html):
+            self.assertTrue("src=" in tag or 'type="application/json"' in tag, tag)
+
+    def test_link_title_cannot_break_out_of_chart_data(self):
+        URL.objects.create(owner=self.alice, link="https://example.com/x", title="</script><script>alert(1)</script>",
+                           custom_url="xss")
+        self.client.get("/xss/")
+        self.client.force_login(self.alice)
+        html = self.client.get("/urls/").content.decode()
+        self.assertNotIn("<script>alert(1)", html)
+        self.assertIn(r"\u003C/script\u003E\u003Cscript\u003Ealert(1)", html)  # json_script escaped form
 
 
 class TokenGenerationTests(TestCase):
