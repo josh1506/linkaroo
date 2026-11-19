@@ -9,5 +9,5 @@ class UrlDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = 'app/url_tracker/detail_url/index.html'
     lookup_url_kwarg = 'pk'
 
-    def get_object(self, queryset=None):
-        return self.model.objects.get(pk=self.kwargs['pk'])
+    def get_queryset(self):
+        return self.model.objects.filter(owner=self.request.user)

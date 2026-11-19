@@ -1,0 +1,7 @@
+{# Usage: include with message="..." show_cta=True|False #}
+<div class="empty-state">
+    <p class="mb-0">{{ message }}</p>
+    {% if show_cta %}
+        <a class="btn btn-default shadow-sm mt-3" href="{% url 'url_tracker:create' %}">Create Link</a>
+    {% endif %}
+</div>

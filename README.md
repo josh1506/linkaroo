@@ -11,7 +11,10 @@ Linkaroo is a web application that allows users to create custom URLs that redir
 
 ## Installation
 
-Linkaroo is a web-based application, so there's no need for installation. Simply visit the website [Linkaroo](https://www.linkaroo.com) to get started.
+Linkaroo is a web-based application. A public production URL has not been published yet.
+To run it locally: create a Python 3.12 virtualenv, `pip install --require-hashes -r requirements/dev.lock`, copy `.env.example` to `.env` (set `SECRET_KEY`, `DEBUG=True`), then `python manage.py migrate` and `python manage.py runserver`.
+
+> Note: `linkaroo.com` is **not** operated by this project (it currently redirects to a domain-sale page). Don't share short links or send support requests to that domain.
 
 ## Usage
 
@@ -31,7 +34,7 @@ Contributions are welcome! If you have any ideas for new features, improvements,
 
 ## Support
 
-If you encounter any issues or have any questions, please don't hesitate to contact our support team at support@linkaroo.com.
+If you encounter any issues or have questions, please open an issue on the [GitHub repository](https://github.com/josh1506/linkaroo/issues). Please don't include passwords or personal data in issues.
 
 ## License
 

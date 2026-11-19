@@ -11,4 +11,5 @@ class UrlTrackerListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return super().get_queryset().filter(url_owner=self.request.user.pk)
+        # Authorize on the link's current owner; the denormalized url_owner goes stale if a link is reassigned (F7).
+        return super().get_queryset().filter(url__owner=self.request.user).select_related('url')

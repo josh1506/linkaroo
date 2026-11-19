@@ -1,9 +1,6 @@
 def get_total_active_urls(user_url):
-    total_active_url = 0
-
-    for url in user_url:
-        if url.is_active_url:
-            total_active_url += 1
+    """user_url must be annotated with click_count. "Active" = has at least one click (existing meaning, kept)."""
+    total_active_url = sum(1 for url in user_url if url.click_count > 0)
 
     data = [
         ['Active', 'Inactive'],
@@ -12,3 +9,8 @@ def get_total_active_urls(user_url):
     ]
 
     return data
+
+
+def get_enabled_disabled(user_url):
+    enabled = sum(1 for url in user_url if url.status == url.ACTIVE_STATUS)
+    return [['Status', 'Links'], ['Enabled', enabled], ['Disabled', len(user_url) - enabled]]
