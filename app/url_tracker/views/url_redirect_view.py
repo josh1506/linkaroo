@@ -11,12 +11,8 @@ def redirect_view(request, custom_url):
     if request.method not in allowed_methods:
         return HttpResponseNotAllowed(allowed_methods)
 
-<<<<<<< HEAD
     # Disabled links get the same branded 404 as unknown ones and record no click.
     url_model = get_object_or_404(URL, custom_url=custom_url, status=URL.ACTIVE_STATUS)
-=======
-    url_model = get_object_or_404(URL, custom_url=custom_url)
->>>>>>> origin/master
 
     # Always redirect; record at most N clicks per client per link per minute (F5: click inflation / write amplification).
     limit = settings.CLICK_RECORD_LIMIT_PER_MINUTE
