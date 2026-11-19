@@ -158,12 +158,20 @@ class QueryBudgetTests(Base):
     def test_overview_query_count_constant(self):
         self.client.login(username="alice", password="pw-Alice-123!")
         self.client.get(reverse("url_tracker:overview"))  # warm session
+<<<<<<< HEAD
         with self.assertNumQueries(5):  # session, user, urls+counts, grouped clicks, click activity
+=======
+        with self.assertNumQueries(4):  # session, user, urls+counts, grouped clicks
+>>>>>>> origin/master
             self.client.get(reverse("url_tracker:overview"))
         for i in range(10):
             u = URL.objects.create(owner=self.alice, link=f"https://example.com/{i}", title=f"T{i}")
             self.client.get(f"/{u.custom_url}/")
+<<<<<<< HEAD
         with self.assertNumQueries(5):
+=======
+        with self.assertNumQueries(4):
+>>>>>>> origin/master
             self.client.get(reverse("url_tracker:overview"))
 
     def test_redirect_two_queries(self):

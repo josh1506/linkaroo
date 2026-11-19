@@ -1,5 +1,6 @@
 # Changelog
 
+<<<<<<< HEAD
 ## Unreleased: UPG-002 phases 1-2 (branch `upgrade/upg-002`, based on `upgrade/upg-001`, not yet deployed)
 
 ### What users will notice
@@ -12,6 +13,8 @@
 - No migration: uses the existing `status` field on links. Toggling is `POST /urls/toggle/<id>/`, owner-only.
 - Dashboard adds one grouped query (5 total, still constant regardless of link count). 90 automated tests.
 
+=======
+>>>>>>> origin/master
 ## Unreleased: UPG-001 modernization (branch `upgrade/upg-001`, not yet deployed)
 
 ### What users will notice

@@ -28,7 +28,10 @@ class UrlOverviewTemplateView(LoginRequiredMixin, generic.TemplateView):
         kwargs['total_clicks_data'] = clicks_7_days
         # Charts can't be drawn without at least one link (no data columns); templates show an empty state instead.
         kwargs['has_links'] = bool(user_url)
+<<<<<<< HEAD
         kwargs['enabled_disabled'] = get_enabled_disabled(user_url)
         kwargs['activity'] = get_click_activity(URLTracker.objects.filter(url__owner=self.request.user), 30, 90)
+=======
+>>>>>>> origin/master
 
         return kwargs
