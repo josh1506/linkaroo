@@ -6,10 +6,7 @@ const latestTotalClicks = readChartData('latest-total-clicks-data');
 const totalClicks = readChartData('total-clicks-data');
 const totalLinksData = readChartData('total-links-data');
 const totalActiveUrl = readChartData('total-active-url-data');
-<<<<<<< HEAD
 const activity = readChartData('activity-data');
 const enabledDisabled = readChartData('enabled-disabled-data');
-=======
->>>>>>> origin/master
 
 google.charts.load('current', {'packages': ['corechart']});
