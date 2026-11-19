@@ -32,7 +32,7 @@ urlpatterns = [
 urlpatterns += [
     path('auth/', include('app.users.urls')),
     path('urls/', include('app.url_tracker.urls')),
-    path('<str:custom_url>/', redirect_view)
+    path('<str:custom_url>/', redirect_view, name='redirect')
 ]
 
 if settings.DEBUG is True:

@@ -6,6 +6,7 @@ from app.url_tracker.views.url_create_view import URLCreateView
 from app.url_tracker.views.url_overview_view import UrlOverviewTemplateView
 from app.url_tracker.views.url_tracker_list_view import UrlTrackerListView
 from app.url_tracker.views.url_redirect_view import redirect_view
+from app.url_tracker.views.url_toggle_status_view import UrlToggleStatusView
 
 
 __all__ = [
@@ -15,5 +16,6 @@ __all__ = [
     UrlListView,
     UrlUpdateView,
     UrlTrackerListView,
-    redirect_view
+    redirect_view,
+    UrlToggleStatusView
 ]

@@ -7,7 +7,8 @@
             <tr>
                 <th>#</th>
                 <th>Title</th>
-                <th>Custom URL</th>
+                <th>Short link</th>
+                <th>Status</th>
                 <th>URL</th>
                 <th>Created Date</th>
             </tr>
@@ -19,7 +20,8 @@
                 <td>
                     <a href="{% url 'url_tracker:details' pk=url.id %}">{{ url.title }}</a>
                 </td>
-                <td>{{ url.custom_url }}</td>
+                <td>{% include 'app/components/copy_link.html' %}</td>
+                <td>{% include 'app/components/status_badge.html' %}</td>
                 <td>{{ url.link }}</td>
                 <td>{{ url.activate_date }}</td>
             </tr>

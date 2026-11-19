@@ -26,10 +26,18 @@
             <div class="row">
                 {% include 'app/url_tracker/overview/latest_total_clicks.html' %}
             </div>
+            <div class="row">
+                {% include 'app/url_tracker/overview/chart_card.html' with title="Clicks, Last 30 Days" chart_id="clicks-per-day-chart" label="Total clicks per day across all your links, last 30 days" %}
+            </div>
+            <div class="row">
+                {% include 'app/url_tracker/overview/chart_card.html' with title="Clicks by Weekday" chart_id="clicks-by-weekday-chart" label="Clicks by day of the week, last 90 days" card_class="col shadow m-3 rounded-4 p-4 bg-default w-25" %}
+                {% include 'app/url_tracker/overview/chart_card.html' with title="Clicks by Hour" chart_id="clicks-by-hour-chart" label="Clicks by hour of the day, last 90 days" card_class="col shadow m-3 rounded-4 p-4 bg-default w-25" %}
+            </div>
         </div>
         <div class="col-12 col-lg-4 mt-3 mt-lg-0">
             {% include 'app/url_tracker/overview/top_links.html' %}
             {% include 'app/url_tracker/overview/total_active_url_chart.html' %}
+            {% include 'app/url_tracker/overview/chart_card.html' with title="Enabled vs Disabled" chart_id="enabled-disabled-chart" label="Share of your links that are enabled or disabled" card_class="rounded-4 shadow p-4 my-4 bg-default" empty_message="No links yet." %}
         </div>
     </div>
 {% endblock %}
@@ -39,6 +47,11 @@
     {{ total_clicks_data|json_script:"total-clicks-data" }}
     {{ total_links_data|json_script:"total-links-data" }}
     {{ total_active_url|json_script:"total-active-url-data" }}
+<<<<<<< HEAD
+    {{ activity|json_script:"activity-data" }}
+    {{ enabled_disabled|json_script:"enabled-disabled-data" }}
+=======
+>>>>>>> origin/master
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="{% static 'js/app/dashboard/init.js' %}"></script>
@@ -46,4 +59,5 @@
     <script type="text/javascript" src="{% static 'js/app/dashboard/total_clicks.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/app/dashboard/latest_clicks.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/app/dashboard/total_active_url.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/app/dashboard/activity.js' %}"></script>
 {% endblock %}

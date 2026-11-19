@@ -13,8 +13,15 @@
             <p>{{ object.title }}</p>
         </div>
         <div>
-            <span class="fs-5">Custom URL:</span>
-            <p>{{ object.custom_url }}</p>
+            <span class="fs-5">Short link:</span>
+            <p>{% include 'app/components/copy_link.html' with url=object %}</p>
+        </div>
+        <div>
+            <span class="fs-5">Status:</span>
+            <p>
+                {% include 'app/components/status_badge.html' with url=object %}
+                {% if object.status != object.ACTIVE_STATUS %}<span class="d-block small mt-1">Visitors see a "Link not found" page and no clicks are recorded.</span>{% endif %}
+            </p>
         </div>
         <div>
             <span class="fs-5">Description:</span>
@@ -23,6 +30,14 @@
     </div>
     <div class="col-2 d-flex flex-column gap-2 px-4">
         <a class="btn btn-warning" href="{% url 'url_tracker:update' pk=object.pk %}">Edit</a>
+        <form method="post" action="{% url 'url_tracker:toggle-status' pk=object.pk %}" class="d-grid">
+            {% csrf_token %}
+            {% if object.status == object.ACTIVE_STATUS %}
+                <button type="submit" class="btn btn-outline-secondary">Disable</button>
+            {% else %}
+                <button type="submit" class="btn btn-success">Enable</button>
+            {% endif %}
+        </form>
         <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
         <a class="btn btn-outline-secondary" href="{% url 'url_tracker:list' %}">Go Back</a>
     </div>

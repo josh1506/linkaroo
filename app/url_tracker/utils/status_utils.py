@@ -9,3 +9,8 @@ def get_total_active_urls(user_url):
     ]
 
     return data
+
+
+def get_enabled_disabled(user_url):
+    enabled = sum(1 for url in user_url if url.status == url.ACTIVE_STATUS)
+    return [['Status', 'Links'], ['Enabled', enabled], ['Disabled', len(user_url) - enabled]]

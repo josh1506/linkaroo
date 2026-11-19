@@ -45,3 +45,37 @@ def get_links_created_day_range(user_url, days_count):
         data.append([day_data, created_count, "blue"])
 
     return data
+
+
+WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+
+def get_click_activity(clicks, days_count, pattern_days):
+    """
+    clicks: URLTracker queryset already scoped to the viewer's links.
+    Returns chart rows for: total clicks per day (last days_count days), and clicks by weekday and by hour
+    of day over the last pattern_days days. Local time (settings.TIME_ZONE), like the charts above.
+    """
+    from django.db.models.functions import ExtractHour, ExtractIsoWeekDay
+
+    day_list = get_date_list(days_count)
+    since = timezone.now() - timedelta(days=pattern_days)
+    start = min(since, timezone.make_aware(datetime.combine(day_list[0], time.min)))
+
+    per_day, per_weekday, per_hour = {}, [0] * 7, [0] * 24
+    rows = (clicks.filter(created_at__gte=start)
+            .annotate(day=TruncDate('created_at'), weekday=ExtractIsoWeekDay('created_at'), hour=ExtractHour('created_at'))
+            .values('day', 'weekday', 'hour')
+            .annotate(n=Count('id')))
+    for row in rows:
+        per_day[row['day']] = per_day.get(row['day'], 0) + row['n']
+        # Grouped by day too, so each (day, hour) bucket is wholly inside or outside the pattern window.
+        if row['day'] >= timezone.localdate(since):
+            per_weekday[row['weekday'] - 1] += row['n']
+            per_hour[row['hour']] += row['n']
+
+    return {
+        'per_day': [['Day', 'Clicks'], *[[day.strftime('%b %d'), per_day.get(day, 0)] for day in day_list]],
+        'per_weekday': [['Day', 'Clicks'], *zip(WEEKDAYS, per_weekday)],
+        'per_hour': [['Hour', 'Clicks'], *[[f'{h:02d}:00', n] for h, n in enumerate(per_hour)]],
+    }

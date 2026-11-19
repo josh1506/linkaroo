@@ -1,0 +1,5 @@
+{% url 'redirect' url.custom_url as short_path %}
+<span class="d-inline-flex align-items-center gap-2 text-nowrap">
+    <code class="text-reset">{{ request.get_host }}{{ short_path }}</code>
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-copy="{{ request.scheme }}://{{ request.get_host }}{{ short_path }}" aria-label="Copy short link for {{ url.title }}">Copy</button>
+</span>

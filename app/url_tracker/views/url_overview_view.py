@@ -2,7 +2,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
 from django.views import generic
 
+from app.url_tracker.models import URLTracker
 from app.url_tracker.utils import (
+    get_click_activity,
+    get_enabled_disabled,
     get_links_created_day_range,
     get_total_active_urls,
     get_top_5_links,
@@ -25,5 +28,10 @@ class UrlOverviewTemplateView(LoginRequiredMixin, generic.TemplateView):
         kwargs['total_clicks_data'] = clicks_7_days
         # Charts can't be drawn without at least one link (no data columns); templates show an empty state instead.
         kwargs['has_links'] = bool(user_url)
+<<<<<<< HEAD
+        kwargs['enabled_disabled'] = get_enabled_disabled(user_url)
+        kwargs['activity'] = get_click_activity(URLTracker.objects.filter(url__owner=self.request.user), 30, 90)
+=======
+>>>>>>> origin/master
 
         return kwargs

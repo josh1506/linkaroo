@@ -35,7 +35,11 @@ class EmptyStateTests(UxBase):
     def test_populated_dashboard_draws_labelled_charts(self):
         _, html = self.page(self.full, "/urls/")
         charts = re.findall(r'<div id="[^"]+" class="chart" role="img" aria-label="[^"]+">', html)
+<<<<<<< HEAD
+        self.assertEqual(len(charts), 8)
+=======
         self.assertEqual(len(charts), 4)
+>>>>>>> origin/master
 
     def test_empty_link_list_offers_next_step_and_no_pagination(self):
         _, html = self.page(self.empty, "/urls/list/")

@@ -1,5 +1,20 @@
 # Changelog
 
+<<<<<<< HEAD
+## Unreleased: UPG-002 phases 1-2 (branch `upgrade/upg-002`, based on `upgrade/upg-001`, not yet deployed)
+
+### What users will notice
+- **Disable / enable links:** on the link's details page. A disabled link shows visitors the "Link not found" page and records no clicks; its alias and click history are kept, and enabling it again restores the redirect.
+- **Copy link:** the details page and the link list show the full short link with a Copy button.
+- **Link list:** new Status column (Enabled / Disabled).
+- **Dashboard:** four new charts: total clicks per day (last 30 days), clicks by weekday and by hour (last 90 days, local time), and enabled vs disabled links.
+
+### Under the hood
+- No migration: uses the existing `status` field on links. Toggling is `POST /urls/toggle/<id>/`, owner-only.
+- Dashboard adds one grouped query (5 total, still constant regardless of link count). 90 automated tests.
+
+=======
+>>>>>>> origin/master
 ## Unreleased: UPG-001 modernization (branch `upgrade/upg-001`, not yet deployed)
 
 ### What users will notice
